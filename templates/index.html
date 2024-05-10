@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job finder</title>
+</head>
+<body>
+    <h1>New Jobs</h1>
+    <ul id="jobList">
+        {% for job in all_entries %}
+        <li>
+            <a href="{{ job.link }}">{{ job.title }}</a> - Published: {{ job.published }}
+        </li>
+        {% endfor %}
+    </ul>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.js"></script>
+    <script>
+        var socket = io.connect();
+        socket.on('connect', function(){
+            console.log("connected to Server")
+        });
+
+        socket.on('new_job', function(job){
+            console.log('New Job', job);
+            var listitem = document.createElement('li');  
+            listitem.innerHTML = '<a href="' + job.link + '">' + job.title + '</a> - Published: ' + job.published;
+            document.getElementById('jobList').appendChild(listitem);
+            displayNotification(job.title,{
+                body: 'A new Job has been Posted!',
+                icon: "icon.png"
+            });
+        });
+        
+
+        function displayNotification(title,options){
+            if (!("Notification" in window)){
+                console.log("This browser does not support notifications");
+            } else if (Notification.permission === "granted"){
+                var notification = new Notification(title,options); 
+            } else if (Notification.permission !== "denied"){
+                Notification.requestPermission().then(function(permission){
+                    if (permission === "granted"){
+                        var notification = new Notification(title, options);
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>
