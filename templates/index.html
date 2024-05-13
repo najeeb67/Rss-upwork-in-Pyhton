@@ -3,17 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Job finder</title>
+    <title>Job Finder</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            padding-top: 50px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 36px;
+            color: #007bff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            letter-spacing: 1px;
+        }
+
+        .job-item {
+            background-color: #fff;
+            border: 1px solid #e2e2e2;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .job-title {
+            color: #007bff;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .job-title:hover {
+            text-decoration: underline;
+        }
+
+        .job-title.clicked {
+            color: #6c757d;
+            text-decoration: none;
+        }
+
+        .job-published {
+            color: #6c757d;
+        }
+
+        @media (max-width: 576px) {
+            .container {
+                padding: 0 15px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>New Jobs</h1>
-    <ul id="jobList">
-        {% for job in all_entries %}
-        <li>
-            <a href="{{ job.link }}">{{ job.title }}</a> - Published: {{ job.published }}
-        </li>
-        {% endfor %}
-    </ul>
+    <div class="container">
+        <h1>New Jobs</h1>
+        <div id="jobList">
+            {% for job in all_entries %}
+            <div class="job-item">
+                <a class="job-title" href="{{ job.link }}" onclick="markAsClicked(this)" target="blank">{{ job.title }}</a>
+                <p class="job-published">Published: {{ job.published }}</p>
+            </div>
+            {% endfor %}
+    
+            {% for job in previous_entries %}
+            <div class="job-item">
+                <a class="job-title" href="{{ job.link }}" onclick="markAsClicked(this)" target="blank">{{ job.title }}</a>
+                <p class="job-published">Published: {{ job.published }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.js"></script>
     <script>
         var socket = io.connect();
@@ -23,15 +91,20 @@
 
         socket.on('new_job', function(job){
             console.log('New Job', job);
-            var listitem = document.createElement('li');  
-            listitem.innerHTML = '<a href="' + job.link + '">' + job.title + '</a> - Published: ' + job.published;
-            document.getElementById('jobList').appendChild(listitem);
+            var jobList = document.getElementById('jobList');
+            var jobItem = document.createElement('div');
+            jobItem.classList.add('job-item');
+            jobItem.innerHTML = '<a class="job-title" href="' + job.link + '" onclick="markAsClicked(this)">' + job.title + '</a><p class="job-published">Published: ' + job.published + '</p>';
+            jobList.insertBefore(jobItem, jobList.firstChild);
             displayNotification(job.title,{
                 body: 'A new Job has been Posted!',
                 icon: "icon.png"
             });
         });
-        
+
+        function markAsClicked(link){
+            link.classList.add('clicked');
+        }
 
         function displayNotification(title,options){
             if (!("Notification" in window)){
@@ -46,6 +119,16 @@
                 });
             }
         }
-    </script>
+
+        function reloadpage(){
+            setTimeout(function(){
+                window.location.reload();
+            },5000);
+        }
+
+        window.onload = function(){
+            reloadpage();
+        }
+    </script> 
 </body>
 </html>
