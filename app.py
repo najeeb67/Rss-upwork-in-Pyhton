@@ -2,11 +2,14 @@ import feedparser
 from datetime import datetime, timedelta
 from win10toast import ToastNotifier
 from flask import Flask, render_template
+from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO
 import sys
 
 app = Flask(__name__)
-socketio = SocketIO(app)
+app.config['SECRET_KEY'] = 'secret!'
+socketio = SocketIO(app, cors_allowed_origins="*")
+
 
 Rss_Notificaation =  ToastNotifier()
 
@@ -31,30 +34,44 @@ def get_title():
 def set_title(title):
     with open(Rss_File, 'w', encoding="utf-8") as file:
         file.write(title)
-  
+
+
+def latest_entry(feed):
+    latest_entry = feed.entries[0] if feed.entries else None
+    if latest_entry:
+        return {
+            'title': latest_entry.title,
+            'link': latest_entry.link,
+            'published': latest_entry.published,
+        }
+    else:
+        return None
+
+
 
 def check_feed(feed):
     new_entries = []
+    latest = latest_entry(feed) 
     new_get_titles = get_title()
-    curret_time = datetime.now()
-    latest_entry = feed.entries[0] if feed.entries else None
-    if latest_entry and latest_entry.title != new_get_titles:
+    current_time = datetime.now()
+
+    if latest and latest['title'] != new_get_titles:  
         new_entries.append({
-            'title': latest_entry.title,
-            'link':latest_entry.link,
-            'published': latest_entry.published,
+            'title': latest['title'],
+            'link': latest['link'],
+            'published': latest['published'],
         })
-        set_title(latest_entry.title)
-        encoded_title = latest_entry.title.encode(sys.stdout.encoding, errors='replace')
-        Rss_Notificaation.show_toast("Upwork Notification", encoded_title.decode(sys.stdout.encoding), duration=5)
+        set_title(latest['title'])
+        encoded_title = latest['title'].encode(sys.stdout.encoding, errors='replace')
+        # Rss_Notificaation.show_toast("Upwork Notification", encoded_title.decode(sys.stdout.encoding), duration=5)
 
     for entry in feed.entries:
-        entry_time = datetime.strptime(entry.published,'%a, %d %b %Y %H:%M:%S %z')
-        entry_time = entry_time.replace(tzinfo=None) 
-        if curret_time - entry_time < timedelta(days=1):
+        entry_time = datetime.strptime(entry.published, '%a, %d %b %Y %H:%M:%S %z')
+        entry_time = entry_time.replace(tzinfo=None)
+        if current_time - entry_time < timedelta(days=1):
             new_entries.append({
                 'title': entry.title,
-                'link':entry.link,
+                'link': entry.link,
                 'published': entry.published,
             })
     return new_entries
@@ -75,6 +92,11 @@ def index():
 @socketio.on('connect')
 def connect():
     print("client connected")
+    recent_feed = fetch_url(RSS_url)
+    latest_entry_item = latest_entry(recent_feed)
+    # print(latest_entry_item)
+    if latest_entry_item:
+        socketio.emit('new_job', latest_entry_item)
 
 def main():
     socketio.run(app, debug=True)
