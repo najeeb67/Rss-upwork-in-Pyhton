@@ -11,6 +11,47 @@
             background-color: #f8f9fa;
             padding-top: 50px;
         }
+        .container {
+            display: flex;
+            flex-direction: row;
+            margin: 20px auto;
+            max-width: 1200px;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar {
+            flex: 1;
+            padding: 20px;
+            background-color: #f1f1f1;
+            border-right: 1px solid #ccc;
+        }
+
+        .sidebar h3 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .sidebar li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .main-content {
+            flex: 3;
+            padding: 20px;
+        }
 
         .container {
             max-width: 800px;
@@ -63,26 +104,49 @@
 </head>
 <body>
     <div class="container">
-        <h1>New Jobs</h1>
-        <div id="jobList">
-            {% for job in all_entries %}
-            <div class="job-item">
-                <a class="job-title" href="{{ job.link }}" onclick="markAsClicked(this)" target="blank">{{ job.title }}</a>
-                <p class="job-published">Published: {{ job.published }}</p>
+        <div class="sidebar">
+            <h3>Categories</h3>
+            <ul>
+                <li><a href="#" onclick="showJobs('python')">Python Jobs</a></li>
+                <li><a href="#" onclick="showJobs('react')">React Jobs</a></li>
+            </ul>
+        </div>
+        <div class="main-content">
+            <div id="pythonJobs" style="display: none;">
+                <h1>Python Jobs</h1>
+                {% for job in python_entries %}
+                <div class="job-item">
+                    <a class="job-title" href="{{ job.link }}" onclick="markAsClicked(this)" target="_blank">{{ job.title }}</a>
+                    <p class="job-published">Published: {{ job.published }}</p>
+                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
+    
+            <div id="reactJobs" style="display: none;">
+                <h1>React Jobs</h1>
+                {% for job in react_entries %}
+                <div class="job-item">
+                    <a class="job-title" href="{{ job.link }}" onclick="markAsClicked(this)" target="_blank">{{ job.title }}</a>
+                    <p class="job-published">Published: {{ job.published }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
     
             {% for job in previous_entries %}
             <div class="job-item">
-                <a class="job-title" href="{{ job.link }}" onclick="markAsClicked(this)" target="blank">{{ job.title }}</a>
+                <a class="job-title" href="{{ job.link }}" onclick="markAsClicked(this)" target="_blank">{{ job.title }}</a>
                 <p class="job-published">Published: {{ job.published }}</p>
             </div>
             {% endfor %}
         </div>
+        <div id="notificationContainer"></div>
         <div id="connectionStatus">Connecting...</div>
+<div id="logContainer" style="position: fixed; bottom: 20px; right: 20px; background-color: rgba(255, 255, 255, 0.8); padding: 10px; border-radius: 5px; max-width: 300px; overflow-y: auto; max-height: 200px;"></div>
+
     </div>
     
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
     <script>
         var socket = io.connect('http://' + document.domain + ':' + location.port);
@@ -90,66 +154,96 @@
         socket.on('connect', function(){
             console.log("Connected to Server");
             document.getElementById("connectionStatus").innerText = "Connected";
-            socket.on('new_job', function(job){
-                console.log('New Job', job);})
         });
 
         socket.on('disconnect', function(){
             console.log("Disconnected from Server");
             document.getElementById("connectionStatus").innerText = "Disconnected";
-            socket.on('new_job', function(job){
-                console.log('New Job', job);
-                var jobList = document.getElementById('jobList');
-                var jobItem = document.createElement('div');
-                jobItem.classList.add('job-item');
-                jobItem.innerHTML = '<a class="job-title" href="' + job.link + '">' + job.title + '</a><p class="job-published">Published: ' + job.published + '</p>';
-                jobList.insertBefore(jobItem, jobList.firstChild);
-                displayNotification(job.title,{
-                    body: 'A new Job has been Posted!',
-                    icon: "icon.png"
-                });
-            })
         });
-    
-        socket.on('new_job', function(job){
-            console.log('New Job', job);
-            var jobList = document.getElementById('jobList');
+
+        function logToContainer(message) {
+            var logContainer = document.getElementById("logContainer");
+            var logMessage = document.createElement("div");
+            logMessage.innerText = message;
+            logContainer.appendChild(logMessage);
+            logContainer.scrollTop = logContainer.scrollHeight; 
+        }
+        
+        socket.on('new_python_job', function(job){ 
+            notify(job);
+            reloadPage();
+            var jobList = document.getElementById('pythonJobs');
             var jobItem = document.createElement('div');
             jobItem.classList.add('job-item');
-            jobItem.innerHTML = '<a class="job-title" href="' + job.link + '">' + job.title + '</a><p class="job-published">Published: ' + job.published + '</p>';
+            jobItem.innerHTML = '<a class="job-title" href="' + job.link + '" onclick="markAsClicked(this)" target="_blank">' + job.title + '</a><p class="job-published">Published: ' + job.published + '</p>';
             jobList.insertBefore(jobItem, jobList.firstChild);
-            displayNotification(job.title,{
-                body: 'A new Job has been Posted!',
-                icon: "icon.png"
-            });
+            displayNotification("New Python Job: " + job.title);
         });
-    
+        
+        socket.on('new_react_job', function(job){ 
+            notify(job);
+            reloadPage();
+            var jobList = document.getElementById('reactJobs');
+            var jobItem = document.createElement('div');
+            jobItem.classList.add('job-item');
+            jobItem.innerHTML = '<a class="job-title" href="' + job.link + '" onclick="markAsClicked(this)" target="_blank">' + job.title + '</a><p class="job-published">Published: ' + job.published + '</p>';
+            jobList.insertBefore(jobItem, jobList.firstChild);
+            displayNotification("New React Job: " + job.title);
+        });
+        
         function markAsClicked(link){
             link.classList.add('clicked');
         }
-        function displayNotification(title){
-            if (!("Notification" in window)){
-                console.log("This browser does not support notifications");
-            } else if (Notification.permission === "granted"){
-                var notification = new Notification(title); 
-            } else if (Notification.permission !== "denied"){
-                Notification.requestPermission().then(function(permission){
-                    if (permission === "granted"){
-                        var notification = new Notification(title, options);
-                    }
+
+        if ("Notification" in window){
+            if (Notification.permission ==='granted'){
+                notify();
+            } else {
+                Notification.requestPermission().then((res) => {
+                    if (res === 'granted'){
+                        notify();
+                    } else if (res ==='denied'){
+                        console.log('Permission denied');
+                    } else if (res ==="default")
+                    console.log("notification permision not given ")
+                })
+            }
+        } else {
+            console.log("Notification not supported");
+        }
+
+        function notify(job) {
+            if (Notification.permission === 'granted') {
+                var notification = new Notification("New Job", {
+                    body: "New Job: " + job.title,
                 });
             }
         }
-    
+
         function reloadPage(){
             setTimeout(function(){
                 window.location.reload();
             }, 10000);
         }
-    
+        
         window.onload = function(){
             reloadPage();
-        } 
+        }
+        function showJobs(category) {
+            var pythonJobs = document.getElementById('pythonJobs');
+            var reactJobs = document.getElementById('reactJobs');
+        
+            if (category === 'python') {
+                pythonJobs.style.display = 'block';
+                reactJobs.style.display = 'none';
+            } else if (category === 'react') {
+                pythonJobs.style.display = 'none';
+                reactJobs.style.display = 'block';
+            }
+        }
+        
+        
     </script>    
+</body>
 </body>
 </html>
