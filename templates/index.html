@@ -5,102 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Job Finder</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
-            padding-top: 50px;
-        }
-        .container {
-            display: flex;
-            flex-direction: row;
-            margin: 20px auto;
-            max-width: 1200px;
-            padding: 20px;
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .sidebar {
-            flex: 1;
-            padding: 20px;
-            background-color: #f1f1f1;
-            border-right: 1px solid #ccc;
-        }
-
-        .sidebar h3 {
-            margin-bottom: 20px;
-            color: #333;
-        }
-
-        .sidebar ul {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        .sidebar li {
-            margin-bottom: 10px;
-        }
-
-        .sidebar a {
-            text-decoration: none;
-            color: #007bff;
-            font-weight: bold;
-        }
-
-        .main-content {
-            flex: 3;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        h1 {
-            text-align: center;
-            margin-bottom: 30px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size: 36px;
-            color: #007bff;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-            letter-spacing: 1px;
-        }
-
-        .job-item {
-            background-color: #fff;
-            border: 1px solid #e2e2e2;
-            border-radius: 5px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .job-title {
-            color: #007bff;
-            font-weight: bold;
-            text-decoration: none;
-        }
-
-        .job-title:hover {
-            text-decoration: underline;
-        }
-
-        .job-title.clicked {
-            color: #6c757d;
-            text-decoration: none;
-        }
-
-        .job-published {
-            color: #6c757d;
-        }
-
-        @media (max-width: 576px) {
-            .container {
-                padding: 0 15px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="container">
@@ -109,19 +14,37 @@
             <ul>
                 <li><a href="#" onclick="showJobs('python')">Python Jobs</a></li>
                 <li><a href="#" onclick="showJobs('react')">React Jobs</a></li>
+                <li><a href="#" onclick="showJobs('us')">US Jobs</a></li>
+                <li><a href="#" onclick="showJobs('node')">Node.js Jobs</a></li>
+                <li><a href="#" onclick="showJobs('php')">PHP Jobs</a></li>
+                <li><a href="#" onclick="showJobs('wordpress')">Wordpress Jobs</a></li>
+                <li><a href="#" onclick="showJobs('quickbooks')">QuickBooks Jobs</a></li>
+                <li><a href="#" onclick="showJobs('shopify')">Shopify Jobs</a></li>
+                <li><a href="#" onclick="showJobs('apiIntegration')">API Integration Jobs</a></li>
+                <li><a href="#" onclick="showJobs('paymentGateway')">Payment Gateway Jobs</a></li>
+                <li><a href="#" onclick="showJobs('fullTime')">Full-Time Jobs</a></li>
+                <li><a href="#" onclick="showJobs('chatbot')">Chatbot Jobs</a></li>
+                <li><a href="#" onclick="showJobs('scripting')">Scripting Jobs</a></li>
+                <li><a href="#" onclick="showJobs('bubble')">Bubble Jobs</a></li>
+                <li><a href="#" onclick="showJobs('webrtc')">WebRTC Jobs</a></li>
+                <li><a href="#" onclick="showJobs('vue')">Vue.js Jobs</a></li>
             </ul>
         </div>
-        <div class="main-content">
-            <div id="pythonJobs" style="display: none;">
+        <div class="main-content" style="
+            overflow: scroll;
+            height: 90vh">
+                <div id="pythonJobs" style="display: none;">
                 <h1>Python Jobs</h1>
+                <div id ="job-item">
                 {% for job in python_entries %}
-                <div class="job-item">
+                <div class="job-item" >
                     <a class="job-title" href="{{ job.link }}" onclick="markAsClicked(this)" target="_blank">{{ job.title }}</a>
                     <p class="job-published">Published: {{ job.published }}</p>
                 </div>
                 {% endfor %}
             </div>
-    
+            </div>
+            
             <div id="reactJobs" style="display: none;">
                 <h1>React Jobs</h1>
                 {% for job in react_entries %}
@@ -131,6 +54,147 @@
                 </div>
                 {% endfor %}
             </div>
+            
+            <div id="usJobs" style="display: none;">
+                <h1>US Jobs</h1>
+                {% for job in us_entries %}
+                <div class="job-item">
+                    <a class="job-title" href="{{ job.link }}" onclick="markAsClicked(this)" target="_blank">{{ job.title }}</a>
+                    <p class="job-published">Published: {{ job.published }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div id="nodeJobs" style="display: none;">
+                <h1>Node.js Jobs</h1>
+                {% for job in node_entries %}
+                <div class="job-item">
+                    <a class="job-title" href="{{ job.link }}" onclick="markAsClicked(this)" target="_blank">{{ job.title }}</a>
+                    <p class="job-published">Published: {{ job.published }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div id="phpJobs" style="display: none;">
+                <h1>PHP Jobs</h1>
+                {% for job in php_entries %}
+                <div class="job-item">
+                    <a class="job-title" href="{{ job.link }}" onclick="markAsClicked(this)" target="_blank">{{ job.title }}</a>
+                    <p class="job-published">Published: {{ job.published }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div id="wordpressJobs" style="display: none;">
+                <h1>Wordpress Jobs</h1>
+                {% for job in wordpress_entries %}
+                <div class="job-item">
+                    <a class="job-title" href="{{ job.link }}" onclick="markAsClicked(this)" target="_blank">{{ job.title }}</a>
+                    <p class="job-published">Published: {{ job.published }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div id="quickbooksJobs" style="display: none;">
+                <h1>QuickBooks Jobs</h1>
+                {% for job in quickbooks_entries %}
+                <div class="job-item">
+                    <a class="job-title" href="{{ job.link }}" onclick="markAsClicked(this)" target="_blank">{{ job.title }}</a>
+                    <p class="job-published">Published: {{ job.published }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div id="shopifyJobs" style="display: none;">
+                <h1>Shopify Jobs</h1>
+                {% for job in shopify_entries %}
+                <div class="job-item">
+                    <a class="job-title" href="{{ job.link }}" onclick="markAsClicked(this)" target="_blank">{{ job.title }}</a>
+                    <p class="job-published">Published: {{ job.published }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div id="apiIntegrationJobs" style="display: none;">
+                <h1>API Integration Jobs</h1>
+                {% for job in api_integration_entries %}
+                <div class="job-item">
+                    <a class="job-title" href="{{ job.link }}" target="_blank">{{ job.title }}</a>
+                    <p class="job-published">Published: {{ job.published }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        
+            <div id="paymentGatewayJobs" style="display: none;">
+                <h1>Payment Gateway Jobs</h1>
+                {% for job in payment_gateway_entries %}
+                <div class="job-item">
+                    <a class="job-title" href="{{ job.link }}" target="_blank">{{ job.title }}</a>
+                    <p class="job-published">Published: {{ job.published }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        
+            <div id="fullTimeJobs" style="display: none;">
+                <h1>Full-Time Jobs</h1>
+                {% for job in full_time_entries %}
+                <div class="job-item">
+                    <a class="job-title" href="{{ job.link }}" target="_blank">{{ job.title }}</a>
+                    <p class="job-published">Published: {{ job.published }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div id="chatbotJobs" style="display: none;">
+                <h1>Chatbot Jobs</h1>
+                {% for job in chatbot_entries %}
+                <div class="job-item">
+                    <a class="job-title" href="{{ job.link }}" onclick="markAsClicked(this)" target="_blank">{{ job.title }}</a>
+                    <p class="job-published">Published: {{ job.published }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div id="scriptingJobs" style="display: none;">
+                <h1>Scripting Jobs</h1>
+                {% for job in scripting_entries %}
+                <div class="job-item">
+                    <a class="job-title" href="{{ job.link }}" onclick="markAsClicked(this)" target="_blank">{{ job.title }}</a>
+                    <p class="job-published">Published: {{ job.published }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div id="bubbleJobs" style="display: none;">
+                <h1>Bubble Jobs</h1>
+                {% for job in bubble_entries %}
+                <div class="job-item">
+                    <a class="job-title" href="{{ job.link }}" onclick="markAsClicked(this)" target="_blank">{{ job.title }}</a>
+                    <p class="job-published">Published: {{ job.published }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div id="webrtcJobs" style="display: none;">
+                <h1>WebRTC Jobs</h1>
+                {% for job in webrtc_entries %}
+                <div class="job-item">
+                    <a class="job-title" href="{{ job.link }}" onclick="markAsClicked(this)" target="_blank">{{ job.title }}</a>
+                    <p class="job-published">Published: {{ job.published }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div id="vueJobs" style="display: none;">
+                <h1>Vue.js Jobs</h1>
+                {% for job in vue_entries %}
+                <div class="job-item">
+                    <a class="job-title" href="{{ job.link }}" onclick="markAsClicked(this)" target="_blank">{{ job.title }}</a>
+                    <p class="job-published">Published: {{ job.published }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            
         </div>
     </div>
     
@@ -146,104 +210,8 @@
 <div id="logContainer" style="position: fixed; bottom: 20px; right: 20px; background-color: rgba(255, 255, 255, 0.8); padding: 10px; border-radius: 5px; max-width: 300px; overflow-y: auto; max-height: 200px;"></div>
 
     </div>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
-    <script>
-        var socket = io.connect('http://' + document.domain + ':' + location.port);
-
-        socket.on('connect', function(){
-            console.log("Connected to Server");
-            document.getElementById("connectionStatus").innerText = "Connected";
-        });
-
-        socket.on('disconnect', function(){
-            console.log("Disconnected from Server");
-            document.getElementById("connectionStatus").innerText = "Disconnected";
-        });
-
-        function logToContainer(message) {
-            var logContainer = document.getElementById("logContainer");
-            var logMessage = document.createElement("div");
-            logMessage.innerText = message;
-            logContainer.appendChild(logMessage);
-            logContainer.scrollTop = logContainer.scrollHeight; 
-        }
-        
-        socket.on('new_python_job', function(job){ 
-            notify(job);
-            reloadPage();
-            var jobList = document.getElementById('pythonJobs');
-            var jobItem = document.createElement('div');
-            jobItem.classList.add('job-item');
-            jobItem.innerHTML = '<a class="job-title" href="' + job.link + '" onclick="markAsClicked(this)" target="_blank">' + job.title + '</a><p class="job-published">Published: ' + job.published + '</p>';
-            jobList.insertBefore(jobItem, jobList.firstChild);
-            displayNotification("New Python Job: " + job.title);
-        });
-        
-        socket.on('new_react_job', function(job){ 
-            notify(job);
-            reloadPage();
-            var jobList = document.getElementById('reactJobs');
-            var jobItem = document.createElement('div');
-            jobItem.classList.add('job-item');
-            jobItem.innerHTML = '<a class="job-title" href="' + job.link + '" onclick="markAsClicked(this)" target="_blank">' + job.title + '</a><p class="job-published">Published: ' + job.published + '</p>';
-            jobList.insertBefore(jobItem, jobList.firstChild);
-            displayNotification("New React Job: " + job.title);
-        });
-        
-        function markAsClicked(link){
-            link.classList.add('clicked');
-        }
-
-        if ("Notification" in window){
-            if (Notification.permission ==='granted'){
-                notify();
-            } else {
-                Notification.requestPermission().then((res) => {
-                    if (res === 'granted'){
-                        notify();
-                    } else if (res ==='denied'){
-                        console.log('Permission denied');
-                    } else if (res ==="default")
-                    console.log("notification permision not given ")
-                })
-            }
-        } else {
-            console.log("Notification not supported");
-        }
-
-        function notify(job) {
-            if (Notification.permission === 'granted') {
-                var notification = new Notification("New Job", {
-                    body: "New Job: " + job.title,
-                });
-            }
-        }
-
-        function reloadPage(){
-            setTimeout(function(){
-                window.location.reload();
-            }, 10000);
-        }
-        
-        window.onload = function(){
-            reloadPage();
-        }
-        function showJobs(category) {
-            var pythonJobs = document.getElementById('pythonJobs');
-            var reactJobs = document.getElementById('reactJobs');
-        
-            if (category === 'python') {
-                pythonJobs.style.display = 'block';
-                reactJobs.style.display = 'none';
-            } else if (category === 'react') {
-                pythonJobs.style.display = 'none';
-                reactJobs.style.display = 'block';
-            }
-        }
-        
-        
-    </script>    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>   
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </body>
 </html>
