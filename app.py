@@ -1,16 +1,37 @@
 import feedparser
 from datetime import datetime, timedelta
-# from win10toast import ToastNotifier
+from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask, render_template
+from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO
 import sys
+import traceback
+import time
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///jobs.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+scheduler = BackgroundScheduler()
+scheduler.start()
+
+
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 
-# Rss_Notificaation =  ToastNotifier()
+
+class JobPosting(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(255))
+    link = db.Column(db.String(255))
+    published = db.Column(db.DateTime)
+
+
+def delete_old_data():
+    threshold = datetime.utcnow() - timedelta(hours=24)
+    JobPosting.query.filter(JobPosting.published < threshold).delete()
+    db.session.commit()
 
 RSS_react_url = "https://www.upwork.com/ab/feed/jobs/rss?location=Australia%2CCanada%2CChile%2CDenmark%2CFrance%2CGermany%2CItaly%2CNetherlands%2CNew%20Zealand%2CSaudi%20Arabia%2CSwitzerland%2CUnited%20Arab%20Emirates%2CUnited%20Kingdom%2CUnited%20States&paging=0-10&q=react.js%20NOT%20Expensify&sort=recency&api_params=1&securityToken=81e2b4b45c1bf6ef8752e649541dc096c20e5256d9034c5b7b5898739550d9fb376ac7e6e4e9632b1f46b176ab780d4ebb09f44ae9b3e5ee6b505b0bbfe61d2a&userUid=1672273345003061248&orgUid=1672273345003061249"
 
@@ -37,10 +58,24 @@ Rss_File = "File.txt"
 
 
 
-def fetch_url(url, count=10):
+def fetch_with_retry(url, count=10, max_retries=3, retry_delay=5):
+    retries = 0
+    while retries < max_retries:
+        try:
+            url += f"&paging=0-{count}"
+            return feedparser.parse(url)
+        except Exception as e:
+            print(f"Error fetching {url}: {e}")
+            traceback.print_exc()
+            retries += 1
+            time.sleep(retry_delay)
+    print(f"Failed to fetch {url} after {max_retries} retries")
+    return None
 
-    url += f"&paging=0-{count}"
-    return feedparser.parse(url)
+
+def fetch_url(url, count=10):
+    return fetch_with_retry(url, count)
+
 
 def get_title():
     try:
@@ -87,11 +122,14 @@ def check_feed(feed):
     for entry in feed.entries:
         entry_time = datetime.strptime(entry.published, '%a, %d %b %Y %H:%M:%S %z')
         entry_time = entry_time.replace(tzinfo=None)
-        if current_time - entry_time < timedelta(days=1):
+        if current_time - entry_time < timedelta(days=2):
+            new_job = JobPosting(title=entry.title, link=entry.link, published=entry_time)
+            db.session.add(new_job)
+            db.session.commit()
             new_entries.append({
                 'title': entry.title,
                 'link': entry.link,
-                'published': entry.published,
+                'published': entry_time,
             })
     return new_entries
 
@@ -132,10 +170,11 @@ def index():
     bubble_entries = check_feed(bubble_feed)
     webrtc_entries = check_feed(webrtc_feed)
     vue_entries = check_feed(vue_feed)
-    # print(api_integration_entries)
+    previous_job_postings = JobPosting.query.all()
+    # print(python_entries)
     return render_template('index.html', python_entries=python_entries, react_entries=react_entries, us_entries=us_entries, node_entries=node_entries,php_entries=php_entries,wordpress_entries=wordpress_entries,
                            quickbooks_entries=quickbooks_entries,shopify_entries=shopify_entries,api_integration_entries=api_integration_entries,payment_gateway_entries=payment_gateway_entries,
-                           full_time_entries=full_time_entries,chatbot_entries=chatbot_entries,scripting_entries=scripting_entries,bubble_entries=bubble_entries,webrtc_entries=webrtc_entries,vue_entries=vue_entries)
+                           full_time_entries=full_time_entries,chatbot_entries=chatbot_entries,scripting_entries=scripting_entries,bubble_entries=bubble_entries,webrtc_entries=webrtc_entries,vue_entries=vue_entries,previous_job_postings=previous_job_postings)
 
 
 
@@ -178,11 +217,15 @@ def connect():
     latest_webrtc_entry = latest_entry(webrtc_feed)
     latest_vue_entry = latest_entry(vue_feed)
     
+
+
+
+    if latest_react_entry:
+        socketio.emit('new_react_job', latest_react_entry)
    
     if latest_python_entry:
         socketio.emit('new_python_job', latest_python_entry)
-    if latest_react_entry:
-        socketio.emit('new_react_job', latest_react_entry)
+
     if latest_us_entry:
         socketio.emit('new_us_job', latest_us_entry)
     if latest_node_entry:
@@ -213,12 +256,40 @@ def connect():
         socketio.emit('new_vue_job', latest_vue_entry)
 
 
-
+scheduler.add_job(delete_old_data, 'interval', hours=24)
 
 def main():
     socketio.run(app, debug=True)
 
 if __name__ == "__main__":
+    db.create_all
     main()
 
 
+# @socketio.on('connect')
+# def connect():
+#     print("client connected")
+#     feeds = {
+#         'new_react_job': RSS_react_url,
+#         'new_python_job': RSS_Pyhton_url,
+#         'new_us_job': RSS_US_url,
+#         'new_node_job': RSS_NODE_url,
+#         'new_php_job': RSS_PHP_url,
+#         'new_wordpress_job': RSS_WORDPRES_url,
+#         'new_quickbooks_job': RSS_QUICKBOOKS_url,
+#         'new_shopify_job': RSS_SHOPIFY_url,
+#         'new_api_integration_job': RSS_API_INTEGRAGATION_url,
+#         'new_payment_gateway_job': RSS_PAYMENT_GETWAY_url,
+#         'new_full_time_job': RSS_FULL_TIME_url,
+#         'new_chatbot_job': RSS_CHATBOT_url,
+#         'new_scripting_job': RSS_SCRIPPTING_url,
+#         'new_bubble_job': RSS_BUBBLE_url,
+#         'new_webrtc_job': RSS_WEBRTC_url,
+#         'new_vue_job': RSS_VUE_url
+#     }
+
+#     for job_type, url in feeds.items():
+#         feed = fetch_url(url)
+#         latest_entry_data = latest_entry(feed)
+#         if latest_entry_data:
+#             socketio.emit(job_type, latest_entry_data)

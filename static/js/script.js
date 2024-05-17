@@ -19,7 +19,7 @@ function logToContainer(message) {
 }
 
 socket.on('new_python_job', function(job){ 
-    notify(job);
+    notify(job , "Python");
     reloadPage();
     var jobList = document.getElementById('job-item');
     var jobItem = document.createElement('div');
@@ -30,7 +30,7 @@ socket.on('new_python_job', function(job){
 });
 
 socket.on('new_react_job', function(job){ 
-    notify(job);
+    notify(job , "React");
     reloadPage();
     var jobList = document.getElementById('reactJobs');
     var jobItem = document.createElement('div');
@@ -40,9 +40,9 @@ socket.on('new_react_job', function(job){
     displayNotification("New React Job: " + job.title);
 });
 socket.on('new_us_job', function(job){ 
-    notify(job);
+    notify(job , "us");
     reloadPage();
-    var jobList = document.getElementById('usJobs');
+    var jobList = document.getElementById('us_Jobs');
     var jobItem = document.createElement('div');
     jobItem.classList.add('job-item');
     jobItem.innerHTML = '<a class="job-title" href="' + job.link + '" onclick="markAsClicked(this)" target="_blank">' + job.title + '</a><p class="job-published">Published: ' + job.published + '</p>';
@@ -51,7 +51,7 @@ socket.on('new_us_job', function(job){
 });
 
 socket.on('new_node_job', function(job){ 
-    notify(job);
+    notify(job, "node");
     reloadPage();
     var jobList = document.getElementById('nodeJobs');
     var jobItem = document.createElement('div');
@@ -62,7 +62,7 @@ socket.on('new_node_job', function(job){
 });
 
 socket.on('new_php_job', function(job){ 
-    notify(job);
+    notify(job , "php");
     reloadPage();
     var jobList = document.getElementById('phpJobs');
     var jobItem = document.createElement('div');
@@ -73,7 +73,7 @@ socket.on('new_php_job', function(job){
 });
 
 socket.on('new_wordpress_job', function(job){ 
-    notify(job);
+    notify(job, "wordpress");
     reloadPage();
     var jobList = document.getElementById('wordpressJobs');
     var jobItem = document.createElement('div');
@@ -84,7 +84,7 @@ socket.on('new_wordpress_job', function(job){
 });
 
 socket.on('new_quickbooks_job', function(job){ 
-    notify(job);
+    notify(job , "quickbooks");
     reloadPage();
     var jobList = document.getElementById('quickbooksJobs');
     var jobItem = document.createElement('div');
@@ -95,7 +95,7 @@ socket.on('new_quickbooks_job', function(job){
 });
 
 socket.on('new_shopify_job', function(job){ 
-    notify(job);
+    notify(job , "shopify");
     reloadPage();
     var jobList = document.getElementById('shopifyJobs');
     var jobItem = document.createElement('div');
@@ -106,7 +106,7 @@ socket.on('new_shopify_job', function(job){
 });
 
 socket.on('new_api_integration_job', function(job) {
-    notify(job);
+    notify(job , "api_integration");
     reloadPage();
     var jobList = document.getElementById('apiIntegrationJobs');
     var jobItem = document.createElement('div');
@@ -117,7 +117,7 @@ socket.on('new_api_integration_job', function(job) {
 });
 
 socket.on('new_payment_gateway_job', function(job) {
-    notify(job);
+    notify(job, "payment_gatewy");
     reloadPage();
     var jobList = document.getElementById('paymentGatewayJobs');
     var jobItem = document.createElement('div');
@@ -128,7 +128,7 @@ socket.on('new_payment_gateway_job', function(job) {
 });
 
 socket.on('new_full_time_job', function(job) {
-    notify(job);
+    notify(job , "full_time_job");
     reloadPage();
     var jobList = document.getElementById('fullTimeJobs');
     var jobItem = document.createElement('div');
@@ -139,7 +139,7 @@ socket.on('new_full_time_job', function(job) {
 });
 
 socket.on('new_chatbot_job', function(job){ 
-    notify(job);
+    notify(job, "chatbot");
     reloadPage();
     var jobList = document.getElementById('chatbotJobs');
     var jobItem = document.createElement('div');
@@ -150,7 +150,7 @@ socket.on('new_chatbot_job', function(job){
 });
 
 socket.on('new_scripting_job', function(job){ 
-    notify(job);
+    notify(job, "scripting");
     reloadPage();
     var jobList = document.getElementById('scriptingJobs');
     var jobItem = document.createElement('div');
@@ -160,7 +160,7 @@ socket.on('new_scripting_job', function(job){
     displayNotification("New Shopify Job: " + job.title);
 });
 socket.on('new_bubble_job', function(job){ 
-    notify(job);
+    notify(job , "bubble");
     reloadPage();
     var jobList = document.getElementById('bubbleJobs');
     var jobItem = document.createElement('div');
@@ -171,7 +171,7 @@ socket.on('new_bubble_job', function(job){
 });
 
 socket.on('new_webrtc_job', function(job){ 
-    notify(job);
+    notify(job , "webrtc");
     reloadPage();
     var jobList = document.getElementById('webrtcJobs');
     var jobItem = document.createElement('div');
@@ -181,7 +181,7 @@ socket.on('new_webrtc_job', function(job){
     displayNotification("New Shopify Job: " + job.title);
 });
 socket.on('new_vue_job', function(job){ 
-    notify(job);
+    notify(job,"vue_job");
     reloadPage();
     var jobList = document.getElementById('vueJobs');
     var jobItem = document.createElement('div');
@@ -215,9 +215,9 @@ if ("Notification" in window){
 }
 
 var NotificationCount = 0
-function notify(job) {
+function notify(job,category) {
     if (Notification.permission === 'granted' && job) {
-        var notification = new Notification("New Job", {
+        var notification = new Notification("New"+ category+ "Job", {
             body: "New Job: " + job.title,
         });
 
@@ -230,7 +230,7 @@ function notify(job) {
 function reloadPage(){
     setTimeout(function(){
         window.location.reload();
-    }, 60000);
+    }, 120000);
 }
 
 window.onload = function(){
@@ -245,10 +245,24 @@ function showJobs(category) {
 
     var selectedCategory = document.getElementById(category + 'Jobs');
     if (selectedCategory) {
+        var allJobs = selectedCategory.querySelectorAll('.job');
+        var currentTime = new Date();
+        var twentyFourHoursAgo = new Date(currentTime - 24 * 60 * 60 * 1000);
+
+        allJobs.forEach(function(job) {
+            var postedTime = new Date(job.dataset.postedTime);
+            if (postedTime > twentyFourHoursAgo) {
+                job.style.display = 'block';
+            } else {
+                job.style.display = 'none';
+            }
+        });
+
         selectedCategory.style.display = 'block';
         localStorage.setItem('selectedCategory', category);
     }
 }
+
 
 window.onload = function(){
     var selectedCategory = localStorage.getItem('selectedCategory');
