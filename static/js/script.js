@@ -21,7 +21,7 @@ function logToContainer(message) {
 socket.on('new_python_job', function(job){ 
     notify(job , "Python");
     reloadPage();
-    var jobList = document.getElementById('job-item');
+    var jobList = document.getElementById('job-list');
     var jobItem = document.createElement('div');
     jobItem.classList.add('job-item');
     jobItem.innerHTML = '<a class="job-title" href="' + job.link + '" onclick="markAsClicked(this)" target="_blank">' + job.title + '</a><p class="job-published">Published: ' + job.published + '</p>';
@@ -223,6 +223,12 @@ function notify(job,category) {
 
         NotificationCount ++;
         document.title = "(" + NotificationCount + ") Job Finder";
+
+        var badge = document.getElementById(category + 'Count');
+        if (badge){
+            var currentCount = parseInt(badge.innerText, 10);
+            badge.innerText = currentCount + 1;
+        }
     }
 }
 
@@ -230,7 +236,7 @@ function notify(job,category) {
 function reloadPage(){
     setTimeout(function(){
         window.location.reload();
-    }, 120000);
+    }, 150000);
 }
 
 window.onload = function(){

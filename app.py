@@ -124,8 +124,8 @@ def check_feed(feed):
         entry_time = entry_time.replace(tzinfo=None)
         if current_time - entry_time < timedelta(days=2):
             new_job = JobPosting(title=entry.title, link=entry.link, published=entry_time)
-            db.session.add(new_job)
-            db.session.commit()
+            # db.session.add(new_job)
+            # db.session.commit()
             new_entries.append({
                 'title': entry.title,
                 'link': entry.link,
@@ -222,10 +222,8 @@ def connect():
 
     if latest_react_entry:
         socketio.emit('new_react_job', latest_react_entry)
-   
     if latest_python_entry:
         socketio.emit('new_python_job', latest_python_entry)
-
     if latest_us_entry:
         socketio.emit('new_us_job', latest_us_entry)
     if latest_node_entry:
@@ -266,30 +264,3 @@ if __name__ == "__main__":
     main()
 
 
-# @socketio.on('connect')
-# def connect():
-#     print("client connected")
-#     feeds = {
-#         'new_react_job': RSS_react_url,
-#         'new_python_job': RSS_Pyhton_url,
-#         'new_us_job': RSS_US_url,
-#         'new_node_job': RSS_NODE_url,
-#         'new_php_job': RSS_PHP_url,
-#         'new_wordpress_job': RSS_WORDPRES_url,
-#         'new_quickbooks_job': RSS_QUICKBOOKS_url,
-#         'new_shopify_job': RSS_SHOPIFY_url,
-#         'new_api_integration_job': RSS_API_INTEGRAGATION_url,
-#         'new_payment_gateway_job': RSS_PAYMENT_GETWAY_url,
-#         'new_full_time_job': RSS_FULL_TIME_url,
-#         'new_chatbot_job': RSS_CHATBOT_url,
-#         'new_scripting_job': RSS_SCRIPPTING_url,
-#         'new_bubble_job': RSS_BUBBLE_url,
-#         'new_webrtc_job': RSS_WEBRTC_url,
-#         'new_vue_job': RSS_VUE_url
-#     }
-
-#     for job_type, url in feeds.items():
-#         feed = fetch_url(url)
-#         latest_entry_data = latest_entry(feed)
-#         if latest_entry_data:
-#             socketio.emit(job_type, latest_entry_data)

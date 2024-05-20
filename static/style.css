@@ -94,3 +94,14 @@ h1 {
         padding: 0 15px;
     }
 }
+
+.badge {
+    background-color: red;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 50%;
+    font-size: 12px;
+    position: relative;
+    top: -10px;
+    left: 5px;
+}
