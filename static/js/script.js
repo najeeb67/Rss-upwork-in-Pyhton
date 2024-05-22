@@ -1,248 +1,27 @@
 var socket = io.connect('http://' + document.domain + ':' + location.port);
 
-socket.on('connect', function(){
+// Event listener for when the client connects to the server
+socket.on('connect', function() {
     console.log("Connected to Server");
     document.getElementById("connectionStatus").innerText = "Connected";
 });
 
-socket.on('disconnect', function(){
+// Event listener for when the client disconnects from the server
+socket.on('disconnect', function() {
     console.log("Disconnected from Server");
     document.getElementById("connectionStatus").innerText = "Disconnected";
 });
 
+// Function to log messages to the container
 function logToContainer(message) {
     var logContainer = document.getElementById("logContainer");
     var logMessage = document.createElement("div");
     logMessage.innerText = message;
     logContainer.appendChild(logMessage);
-    logContainer.scrollTop = logContainer.scrollHeight; 
+    logContainer.scrollTop = logContainer.scrollHeight;
 }
 
-socket.on('new_python_job', function(job){ 
-    notify(job , "Python");
-    reloadPage();
-    var jobList = document.getElementById('job-list');
-    var jobItem = document.createElement('div');
-    jobItem.classList.add('job-item');
-    jobItem.innerHTML = '<a class="job-title" href="' + job.link + '" onclick="markAsClicked(this)" target="_blank">' + job.title + '</a><p class="job-published">Published: ' + job.published + '</p>';
-    jobList.insertBefore(jobItem, jobList.firstChild);
-    displayNotification("New Python Job: " + job.title);
-});
-
-socket.on('new_react_job', function(job){ 
-    notify(job , "React");
-    reloadPage();
-    var jobList = document.getElementById('reactJobs');
-    var jobItem = document.createElement('div');
-    jobItem.classList.add('job-item');
-    jobItem.innerHTML = '<a class="job-title" href="' + job.link + '" onclick="markAsClicked(this)" target="_blank">' + job.title + '</a><p class="job-published">Published: ' + job.published + '</p>';
-    jobList.insertBefore(jobItem, jobList.firstChild);
-    displayNotification("New React Job: " + job.title);
-});
-socket.on('new_us_job', function(job){ 
-    notify(job , "us");
-    reloadPage();
-    var jobList = document.getElementById('us_Jobs');
-    var jobItem = document.createElement('div');
-    jobItem.classList.add('job-item');
-    jobItem.innerHTML = '<a class="job-title" href="' + job.link + '" onclick="markAsClicked(this)" target="_blank">' + job.title + '</a><p class="job-published">Published: ' + job.published + '</p>';
-    jobList.insertBefore(jobItem, jobList.firstChild);
-    displayNotification("New US Job: " + job.title);
-});
-
-socket.on('new_node_job', function(job){ 
-    notify(job, "node");
-    reloadPage();
-    var jobList = document.getElementById('nodeJobs');
-    var jobItem = document.createElement('div');
-    jobItem.classList.add('job-item');
-    jobItem.innerHTML = '<a class="job-title" href="' + job.link + '" onclick="markAsClicked(this)" target="_blank">' + job.title + '</a><p class="job-published">Published: ' + job.published + '</p>';
-    jobList.insertBefore(jobItem, jobList.firstChild);
-    displayNotification("New Node Job: " + job.title);
-});
-
-socket.on('new_php_job', function(job){ 
-    notify(job , "php");
-    reloadPage();
-    var jobList = document.getElementById('phpJobs');
-    var jobItem = document.createElement('div');
-    jobItem.classList.add('job-item');
-    jobItem.innerHTML = '<a class="job-title" href="' + job.link + '" onclick="markAsClicked(this)" target="_blank">' + job.title + '</a><p class="job-published">Published: ' + job.published + '</p>';
-    jobList.insertBefore(jobItem, jobList.firstChild);
-    displayNotification("New PHP Job: " + job.title);
-});
-
-socket.on('new_wordpress_job', function(job){ 
-    notify(job, "wordpress");
-    reloadPage();
-    var jobList = document.getElementById('wordpressJobs');
-    var jobItem = document.createElement('div');
-    jobItem.classList.add('job-item');
-    jobItem.innerHTML = '<a class="job-title" href="' + job.link + '" onclick="markAsClicked(this)" target="_blank">' + job.title + '</a><p class="job-published">Published: ' + job.published + '</p>';
-    jobList.insertBefore(jobItem, jobList.firstChild);
-    displayNotification("New WordPress Job: " + job.title);
-});
-
-socket.on('new_quickbooks_job', function(job){ 
-    notify(job , "quickbooks");
-    reloadPage();
-    var jobList = document.getElementById('quickbooksJobs');
-    var jobItem = document.createElement('div');
-    jobItem.classList.add('job-item');
-    jobItem.innerHTML = '<a class="job-title" href="' + job.link + '" onclick="markAsClicked(this)" target="_blank">' + job.title + '</a><p class="job-published">Published: ' + job.published + '</p>';
-    jobList.insertBefore(jobItem, jobList.firstChild);
-    displayNotification("New QuickBook Job: " + job.title);
-});
-
-socket.on('new_shopify_job', function(job){ 
-    notify(job , "shopify");
-    reloadPage();
-    var jobList = document.getElementById('shopifyJobs');
-    var jobItem = document.createElement('div');
-    jobItem.classList.add('job-item');
-    jobItem.innerHTML = '<a class="job-title" href="' + job.link + '" onclick="markAsClicked(this)" target="_blank">' + job.title + '</a><p class="job-published">Published: ' + job.published + '</p>';
-    jobList.insertBefore(jobItem, jobList.firstChild);
-    displayNotification("New Shopify Job: " + job.title);
-});
-
-socket.on('new_api_integration_job', function(job) {
-    notify(job , "api_integration");
-    reloadPage();
-    var jobList = document.getElementById('apiIntegrationJobs');
-    var jobItem = document.createElement('div');
-    jobItem.classList.add('job-item');
-    jobItem.innerHTML = '<a class="job-title" href="' + job.link + '" target="_blank">' + job.title + '</a><p class="job-published">Published: ' + job.published + '</p>';
-    jobList.insertBefore(jobItem, jobList.firstChild);
-    displayNotification("New API Integration Job: " + job.title);
-});
-
-socket.on('new_payment_gateway_job', function(job) {
-    notify(job, "payment_gatewy");
-    reloadPage();
-    var jobList = document.getElementById('paymentGatewayJobs');
-    var jobItem = document.createElement('div');
-    jobItem.classList.add('job-item');
-    jobItem.innerHTML = '<a class="job-title" href="' + job.link + '" target="_blank">' + job.title + '</a><p class="job-published">Published: ' + job.published + '</p>';
-    jobList.insertBefore(jobItem, jobList.firstChild);
-    displayNotification("New Payment Gateway Job: " + job.title);
-});
-
-socket.on('new_full_time_job', function(job) {
-    notify(job , "full_time_job");
-    reloadPage();
-    var jobList = document.getElementById('fullTimeJobs');
-    var jobItem = document.createElement('div');
-    jobItem.classList.add('job-item');
-    jobItem.innerHTML = '<a class="job-title" href="' + job.link + '" target="_blank">' + job.title + '</a><p class="job-published">Published: ' + job.published + '</p>';
-    jobList.insertBefore(jobItem, jobList.firstChild);
-    displayNotification("New Full-Time Job: " + job.title);
-});
-
-socket.on('new_chatbot_job', function(job){ 
-    notify(job, "chatbot");
-    reloadPage();
-    var jobList = document.getElementById('chatbotJobs');
-    var jobItem = document.createElement('div');
-    jobItem.classList.add('job-item');
-    jobItem.innerHTML = '<a class="job-title" href="' + job.link + '" onclick="markAsClicked(this)" target="_blank">' + job.title + '</a><p class="job-published">Published: ' + job.published + '</p>';
-    jobList.insertBefore(jobItem, jobList.firstChild);
-    displayNotification("New Shopify Job: " + job.title);
-});
-
-socket.on('new_scripting_job', function(job){ 
-    notify(job, "scripting");
-    reloadPage();
-    var jobList = document.getElementById('scriptingJobs');
-    var jobItem = document.createElement('div');
-    jobItem.classList.add('job-item');
-    jobItem.innerHTML = '<a class="job-title" href="' + job.link + '" onclick="markAsClicked(this)" target="_blank">' + job.title + '</a><p class="job-published">Published: ' + job.published + '</p>';
-    jobList.insertBefore(jobItem, jobList.firstChild);
-    displayNotification("New Shopify Job: " + job.title);
-});
-socket.on('new_bubble_job', function(job){ 
-    notify(job , "bubble");
-    reloadPage();
-    var jobList = document.getElementById('bubbleJobs');
-    var jobItem = document.createElement('div');
-    jobItem.classList.add('job-item');
-    jobItem.innerHTML = '<a class="job-title" href="' + job.link + '" onclick="markAsClicked(this)" target="_blank">' + job.title + '</a><p class="job-published">Published: ' + job.published + '</p>';
-    jobList.insertBefore(jobItem, jobList.firstChild);
-    displayNotification("New Shopify Job: " + job.title);
-});
-
-socket.on('new_webrtc_job', function(job){ 
-    notify(job , "webrtc");
-    reloadPage();
-    var jobList = document.getElementById('webrtcJobs');
-    var jobItem = document.createElement('div');
-    jobItem.classList.add('job-item');
-    jobItem.innerHTML = '<a class="job-title" href="' + job.link + '" onclick="markAsClicked(this)" target="_blank">' + job.title + '</a><p class="job-published">Published: ' + job.published + '</p>';
-    jobList.insertBefore(jobItem, jobList.firstChild);
-    displayNotification("New Shopify Job: " + job.title);
-});
-socket.on('new_vue_job', function(job){ 
-    notify(job,"vue_job");
-    reloadPage();
-    var jobList = document.getElementById('vueJobs');
-    var jobItem = document.createElement('div');
-    jobItem.classList.add('job-item');
-    jobItem.innerHTML = '<a class="job-title" href="' + job.link + '" onclick="markAsClicked(this)" target="_blank">' + job.title + '</a><p class="job-published">Published: ' + job.published + '</p>';
-    jobList.insertBefore(jobItem, jobList.firstChild);
-    displayNotification("New Shopify Job: " + job.title);
-});
-
-function markAsClicked(link){
-    link.classList.add('clicked');
-    NotificationCount = 0;
-    document.title = "Job Finder"
-}
-
-if ("Notification" in window){
-    if (Notification.permission ==='granted'){
-        notify();
-    } else {
-        Notification.requestPermission().then((res) => {
-            if (res === 'granted'){
-                notify();
-            } else if (res ==='denied'){
-                console.log('Permission denied');
-            } else if (res ==="default")
-            console.log("notification permision not given ")
-        })
-    }
-} else {
-    console.log("Notification not supported");
-}
-
-var NotificationCount = 0
-function notify(job,category) {
-    if (Notification.permission === 'granted' && job) {
-        var notification = new Notification("New"+ category+ "Job", {
-            body: "New Job: " + job.title,
-        });
-
-        NotificationCount ++;
-        document.title = "(" + NotificationCount + ") Job Finder";
-
-        var badge = document.getElementById(category + 'Count');
-        if (badge){
-            var currentCount = parseInt(badge.innerText, 10);
-            badge.innerText = currentCount + 1;
-        }
-    }
-}
-
-
-function reloadPage(){
-    setTimeout(function(){
-        window.location.reload();
-    }, 150000);
-}
-
-window.onload = function(){
-    reloadPage();
-} 
-
+// Function to show jobs based on category
 function showJobs(category) {
     var jobCategories = document.querySelectorAll('.main-content > div');
     jobCategories.forEach(function(categoryElement) {
@@ -269,15 +48,131 @@ function showJobs(category) {
     }
 }
 
+// Event listener for new job events from the server
+// Event listener for new job events from the server
+socket.on('new_job', function(data) {
+    console.log("Received new job event with data:", data);
 
-window.onload = function(){
+    // Ensure data and data.job are defined
+    if (data && data.category && data.job) {
+        console.log("Job category:", data.category);
+
+        // Check if the job was posted within the last 24 hours
+        var jobPostedTime = new Date(data.job.published);
+        var currentTime = new Date();
+        var twentyFourHoursAgo = new Date(currentTime - 24 * 60 * 60 * 1000);
+
+        if (jobPostedTime > twentyFourHoursAgo) {
+            // Check if this job has already been notified
+            var notifiedJobs = JSON.parse(localStorage.getItem('notifiedJobs')) || {};
+            if (!notifiedJobs[data.job.id]) {
+                // Update job list
+                var jobList = document.getElementById(data.category + 'Jobs');
+                if (jobList) {
+                    var jobItem = document.createElement('div');
+                    jobItem.classList.add('job-item');
+                    jobItem.innerHTML = '<a class="job-title" href="' + data.job.link + '" onclick="markAsClicked(this)" target="_blank">' + data.job.title + '</a><p class="job-published">Published: ' + data.job.published + '</p>';
+                    jobList.insertBefore(jobItem, jobList.firstChild);
+                } else {
+                    console.error("Job list not found for category:", data.category);
+                }
+
+                // Notify the user about the new job
+                notify(data.job, data.category);
+
+                // Mark this job as notified
+                notifiedJobs[data.job.id] = true;
+                localStorage.setItem('notifiedJobs', JSON.stringify(notifiedJobs));
+            } else {
+                console.log("Job has already been notified, skipping...");
+            }
+        } else {
+            console.log("Job is older than 24 hours, no notification sent.");
+        }
+    } else {
+        console.error("Received job is undefined or missing category property");
+        console.log("Data received:", data);
+    }
+});
+
+
+
+
+function markAsClicked(link) {
+    link.classList.add('clicked');
+    NotificationCount = 0;
+    document.title = "Job Finder";
+}
+
+if ("Notification" in window) {
+    // Check if notification permission is granted
+    if (Notification.permission === 'granted') {
+        console.log('Notification permission granted');
+    } else {
+        // Request permission for notifications
+        Notification.requestPermission().then((res) => {
+            if (res === 'granted') {
+                console.log('Notification permission granted');
+            } else if (res === 'denied') {
+                console.log('Permission denied');
+            } else if (res === 'default') {
+                console.log('Notification permission not given');
+            }
+        });
+    }
+} else {
+    console.log('Notification not supported');
+}
+
+// Variable to keep track of notification count
+var NotificationCount = 0;
+
+// Function to display notification
+function notify(job, category) {
+    if (!job || !category) {
+        console.error("Job or category is undefined");
+        return; // Exit the function if job or category is undefined
+    }
+
+    console.log("Notification received for category:", category);
+    // Check if permission is granted and job is provided
+    if (Notification.permission === 'granted') {
+        // Create notification
+        var notification = new Notification("New " + category + " Job", {
+            body: "New Job: " + job.title
+        });
+
+        // Increment notification count
+        NotificationCount++;
+        // Update document title to show notification count
+        document.title = "(" + NotificationCount + ") Job Finder";
+        console.log("NotificationCount:", NotificationCount);
+        console.log("Document title:", document.title);
+
+        // Update badge count for the category
+        var badges = document.querySelectorAll('.job-badge');
+        badges.forEach(function(badge) {
+            if (badge.dataset.category === category) {
+                var currentCount = parseInt(badge.innerText, 10);
+                badge.innerText = (currentCount + 1).toString();
+            }
+        });
+    }
+}
+
+// Function to reload the page
+function reloadPage() {
+    setTimeout(function() {
+        window.location.reload();
+    }, 300000); // Reload the page every 5 minutes
+}
+
+window.onload = function() {
     var selectedCategory = localStorage.getItem('selectedCategory');
     if (selectedCategory) {
         showJobs(selectedCategory);
     } else {
-       
-        showJobs('python'); 
+        showJobs('python');
     }
     reloadPage();
 }
-
