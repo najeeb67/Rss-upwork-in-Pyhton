@@ -5,7 +5,6 @@ from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO
 import sys
-from flask_migrate import Migrate
 import requests
 import time
 
@@ -14,7 +13,7 @@ app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 
-# Rss_Notificaation =  ToastNotifier()
+scheduler = BackgroundScheduler()
 
 RSS_react_url = "https://www.upwork.com/ab/feed/jobs/rss?location=Australia%2CCanada%2CChile%2CDenmark%2CFrance%2CGermany%2CItaly%2CNetherlands%2CNew%20Zealand%2CSaudi%20Arabia%2CSwitzerland%2CUnited%20Arab%20Emirates%2CUnited%20Kingdom%2CUnited%20States&paging=0-10&q=react.js%20NOT%20Expensify&sort=recency&api_params=1&securityToken=81e2b4b45c1bf6ef8752e649541dc096c20e5256d9034c5b7b5898739550d9fb376ac7e6e4e9632b1f46b176ab780d4ebb09f44ae9b3e5ee6b505b0bbfe61d2a&userUid=1672273345003061248&orgUid=1672273345003061249"
 
@@ -36,9 +35,10 @@ RSS_VUE_url ="https://www.upwork.com/ab/feed/jobs/rss?location=Australia%2CCanad
 
 RSS_Pyhton_url = "https://www.upwork.com/ab/feed/jobs/rss?location=Australia%2CCanada%2CChile%2CDenmark%2CFrance%2CGermany%2CItaly%2CNetherlands%2CNew%20Zealand%2CSaudi%20Arabia%2CSwitzerland%2CUnited%20Arab%20Emirates%2CUnited%20Kingdom%2CUnited%20States&paging=0-10&q=python%20NOT%20india&sort=recency&api_params=1&securityToken=81e2b4b45c1bf6ef8752e649541dc096c20e5256d9034c5b7b5898739550d9fb376ac7e6e4e9632b1f46b176ab780d4ebb09f44ae9b3e5ee6b505b0bbfe61d2a&userUid=1672273345003061248&orgUid=1672273345003061249"
 
+
 Rss_File = "File.txt"
 
-def fetch_with_retry(url, count=10, max_retries=3, retry_delay=5):
+def fetch_with_retry(url, count=10, max_retries=3, retry_delay=1):
     retries = 0
     while retries < max_retries:
         try:
@@ -82,7 +82,10 @@ def latest_entry(feed):
         return None
 
 
+fetched_categories = set()
+
 def check_feed(feed):
+    global fetched_categories
     if feed is None:
         print("Error: Failed to fetch feed.")
         return []
@@ -109,6 +112,11 @@ def check_feed(feed):
             set_title(latest_title)
             print(f"New job posting: {latest_title}")  
 
+            category = latest_title.split()[0]
+            if category not in fetched_categories:
+                print(f"New category Fetch: {category}")
+                fetched_categories.add(category)
+
     for entry in feed.entries:
         try:
             entry_time = datetime.strptime(entry.published, '%a, %d %b %Y %H:%M:%S %z')
@@ -117,7 +125,7 @@ def check_feed(feed):
             print(f"Error parsing datetime for entry: {e}")
             continue
 
-        if current_time - entry_time < timedelta(days=2):
+        if current_time - entry_time < timedelta(days=1):
             new_job = {
                 'title': entry.title,
                 'link': entry.link,
@@ -179,14 +187,16 @@ def connect():
     }
 
     for key, url in feeds.items():
-            # time.sleep(30)
-            entries = check_feed(fetch_url(url))
-            for entry in entries:
-                socketio.emit('new_job', {'job': entry, 'category': key},  namespace='/')
+        scheduler.add_job(fetch_and_emit_job, 'interval', seconds=5, args=[key, url])
 
 @socketio.on('disconnect')
 def disconnect():
     print('Client disconnected')
+
+def fetch_and_emit_job(key, url):
+    entries = check_feed(fetch_url(url))
+    for entry in entries:
+        socketio.emit('new_job', {'job': entry, 'category': key}, namespace='/')
 
 def main():
     socketio.run(app, debug=True)

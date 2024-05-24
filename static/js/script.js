@@ -1,18 +1,20 @@
-var socket = io.connect('http://' + document.domain + ':' + location.port);
+var socket;
+var isConnected = false;
+var socket = io.connect('http://localhost:5000');
 
-// Event listener for when the client connects to the server
+
+  
 socket.on('connect', function() {
-    console.log("Connected to Server");
-    document.getElementById("connectionStatus").innerText = "Connected";
+    console.log('Connected to server');
 });
 
-// Event listener for when the client disconnects from the server
+
 socket.on('disconnect', function() {
-    console.log("Disconnected from Server");
-    document.getElementById("connectionStatus").innerText = "Disconnected";
-});
+        console.log('Disconnected from server');
+    });
+    
 
-// Function to log messages to the container
+
 function logToContainer(message) {
     var logContainer = document.getElementById("logContainer");
     var logMessage = document.createElement("div");
@@ -21,7 +23,6 @@ function logToContainer(message) {
     logContainer.scrollTop = logContainer.scrollHeight;
 }
 
-// Function to show jobs based on category
 function showJobs(category) {
     var jobCategories = document.querySelectorAll('.main-content > div');
     jobCategories.forEach(function(categoryElement) {
@@ -47,53 +48,85 @@ function showJobs(category) {
         localStorage.setItem('selectedCategory', category);
     }
 }
+var newJobCounts = {
+    python: 0,
+    react: 0,
+    // Add other categories here...
+};
 
-// Event listener for new job events from the server
+function updateBadgeCount(category, count) {
+    var badge = document.querySelector('.job-badge[data-category="' + category + '"]');
+    if (badge) {
+        badge.innerText = count.toString();
+    }
+}
+
+
+
 // Event listener for new job events from the server
 socket.on('new_job', function(data) {
     console.log("Received new job event with data:", data);
 
-    // Ensure data and data.job are defined
-    if (data && data.category && data.job) {
+    // Ensure data and data.jobs are defined
+    if (data && data.jobs && data.category) {
         console.log("Job category:", data.category);
 
-        // Check if the job was posted within the last 24 hours
-        var jobPostedTime = new Date(data.job.published);
-        var currentTime = new Date();
-        var twentyFourHoursAgo = new Date(currentTime - 24 * 60 * 60 * 1000);
+        // Update job list for the specified category
+        var jobList = document.getElementById(data.category + 'Jobs');
+        if (jobList) {
+            // Clear the existing job items
+            jobList.innerHTML = '';
 
-        if (jobPostedTime > twentyFourHoursAgo) {
-            // Check if this job has already been notified
-            var notifiedJobs = JSON.parse(localStorage.getItem('notifiedJobs')) || {};
-            if (!notifiedJobs[data.job.id]) {
-                // Update job list
-                var jobList = document.getElementById(data.category + 'Jobs');
-                if (jobList) {
-                    var jobItem = document.createElement('div');
-                    jobItem.classList.add('job-item');
-                    jobItem.innerHTML = '<a class="job-title" href="' + data.job.link + '" onclick="markAsClicked(this)" target="_blank">' + data.job.title + '</a><p class="job-published">Published: ' + data.job.published + '</p>';
-                    jobList.insertBefore(jobItem, jobList.firstChild);
-                } else {
-                    console.error("Job list not found for category:", data.category);
-                }
+            // Update the new job count for the category
+            newJobCounts[data.category] += data.jobs.length;
 
-                // Notify the user about the new job
-                notify(data.job, data.category);
+            // Update badge count for the category
+            updateBadgeCount(data.category, newJobCounts[data.category]);
 
-                // Mark this job as notified
-                notifiedJobs[data.job.id] = true;
-                localStorage.setItem('notifiedJobs', JSON.stringify(notifiedJobs));
-            } else {
-                console.log("Job has already been notified, skipping...");
-            }
+            // Iterate over the new job entries and append them to the job list
+            data.jobs.forEach(function(job) {
+                var jobItem = document.createElement('div');
+                jobItem.classList.add('job-item');
+                jobItem.innerHTML = '<a class="job-title" href="' + job.link + '" onclick="markAsClicked(this)" target="_blank">' + job.title + '</a><p class="job-published">Published: ' + job.published + '</p>';
+                jobList.appendChild(jobItem);
+            });
+
+            notify(data.job, data.category);
         } else {
-            console.log("Job is older than 24 hours, no notification sent.");
+            console.error("Job list not found for category:", data.category);
         }
     } else {
-        console.error("Received job is undefined or missing category property");
+        console.error("Received job list is undefined or missing category property");
         console.log("Data received:", data);
     }
 });
+
+
+// Function to reload page and clear new job counts
+function reloadPage() {
+    console.log("Reloading page...");
+    // Clear new job counts
+    for (var category in newJobCounts) {
+        if (newJobCounts.hasOwnProperty(category)) {
+            newJobCounts[category] = 0;
+        }
+    }
+    // Reload page after 2 minutes
+    setTimeout(function() {
+        window.location.reload();
+    }, 120000);
+}
+
+window.onload = function() {
+    var selectedCategory = localStorage.getItem('selectedCategory');
+    if (selectedCategory) {
+        showJobs(selectedCategory);
+    } else {
+        showJobs('python');
+    }
+    // Reload the page and clear new job counts
+    reloadPage();
+};
 
 
 
@@ -160,19 +193,19 @@ function notify(job, category) {
     }
 }
 
-// Function to reload the page
-function reloadPage() {
-    setTimeout(function() {
-        window.location.reload();
-    }, 300000); // Reload the page every 5 minutes
-}
+// function reloadPage() {
+//     console.log("Reloading page...");
+//     setTimeout(function() {
+//         window.location.reload();
+//     }, 120000); 
+// }
 
-window.onload = function() {
-    var selectedCategory = localStorage.getItem('selectedCategory');
-    if (selectedCategory) {
-        showJobs(selectedCategory);
-    } else {
-        showJobs('python');
-    }
-    reloadPage();
-}
+// window.onload = function() {
+//     var selectedCategory = localStorage.getItem('selectedCategory');
+//     if (selectedCategory) {
+//         showJobs(selectedCategory);
+//     } else {
+//         showJobs('python');
+//     }
+//     reloadPage();
+// }
