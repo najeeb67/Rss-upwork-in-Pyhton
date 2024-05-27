@@ -65,8 +65,9 @@ def fetch_url(url, count=10):
 
 def get_title():
     try:
-        with open(Rss_File, 'r') as file:
+        with open(Rss_File, 'r', encoding="utf-8", errors="ignore") as file:
             return file.read().strip()
+
     except FileNotFoundError:
         return None
 
@@ -133,8 +134,12 @@ def check_feed(feed):
             }
             new_entries.append(new_job)
 
+    # Print the new entries for debugging
+    print("New entries:", new_entries)
+
     socketio.emit('new_job', new_entries)
     return new_entries
+
 
 
 @app.route('/')
