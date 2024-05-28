@@ -1,14 +1,6 @@
 // Establish socket connection
 var socket = io.connect('http://localhost:5000');
-
-// Variables
-var isConnected = false;
-var NotificationCount = 0;
-var newJobCounts = {
-    python: 0,
-    react: 0,
-    // Add other categories here...
-};
+var newJobCounts = {};
 
 // Event listeners for socket connection
 socket.on('connect', function() {
@@ -25,30 +17,35 @@ socket.on('disconnect', function() {
 socket.on('new_job', function(data) {
     console.log("Received new job event with data:", data);
 
-    if (data && data.jobs && data.category) {
+    if (data && data.job && data.category) {
         console.log("Job category:", data.category);
-        console.log("testing")
+        console.log("testing");
+        
         var jobList = document.getElementById(data.category + 'Jobs');
         if (jobList) {
             jobList.innerHTML = '';
 
-            newJobCounts[data.category] += data.jobs.length;
+            if (!newJobCounts[data.category]) {
+                newJobCounts[data.category] = 0;
+            }
+
+            newJobCounts[data.category] += 1;
 
             updateBadgeCount(data.category, newJobCounts[data.category]);
 
-            data.jobs.forEach(function(job) {
-                var jobItem = document.createElement('div');
-                jobItem.classList.add('job-item');
-                jobItem.innerHTML = '<a class="job-title" href="' + job.link + '" onclick="markAsClicked(this)" target="_blank">' + job.title + '</a><p class="job-published">Published: ' + job.published + '</p>';
-                jobList.appendChild(jobItem);
-            });
-            
-            console.log("this is woking")
+            var job = data.job; // Since each emission sends a single job
+            var jobItem = document.createElement('div');
+            jobItem.classList.add('job-item');
+            jobItem.innerHTML = '<a class="job-title" href="' + job.link + '" onclick="markAsClicked(this)" target="_blank">' + job.title + '</a><p class="job-published">Published: ' + job.published + '</p>';
+            jobList.appendChild(jobItem);
+
+            console.log("Job added to the list");
+            notify(job, data.category);
         } else {
             console.error("Job list not found for category:", data.category);
         }
     } else {
-        console.error("Received job list is undefined or missing category property");
+        console.error("Received job data is undefined or missing category property");
         console.log("Data received:", data);
     }
 });
@@ -100,8 +97,7 @@ function notify(job, category) {
     }
 }
 
-notify("hello", "this thewlnfbv")
-// Function to update badge count
+// notify("hello", "this thewlnfbv")
 function updateBadgeCount(category, count) {
     var badge = document.querySelector('.job-badge[data-category="' + category + '"]');
     if (badge) {

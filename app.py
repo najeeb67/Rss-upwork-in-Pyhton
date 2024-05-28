@@ -44,8 +44,15 @@ def fetch_with_retry(url, count=10, max_retries=3, retry_delay=1):
         try:
             url_with_paging = f"{url}&paging=0-{count}"
             response = requests.get(url_with_paging)
-            response.raise_for_status()  
-            return feedparser.parse(response.text)
+            response.raise_for_status()
+            
+            # Print out the raw feed data
+            print("Raw Feed Data:", response.text)
+            
+            parsed_data = feedparser.parse(response.text)
+            print("Parsed Data:", parsed_data)
+            
+            return parsed_data
         except requests.exceptions.RequestException as e:
             print(f"Error fetching {url}: {e}")
             if isinstance(e, requests.exceptions.HTTPError) and e.response.status_code == 429:
@@ -65,9 +72,8 @@ def fetch_url(url, count=10):
 
 def get_title():
     try:
-        with open(Rss_File, 'r', encoding="utf-8", errors="ignore") as file:
+        with open(Rss_File, 'r') as file:
             return file.read().strip()
-
     except FileNotFoundError:
         return None
 
@@ -98,7 +104,9 @@ def check_feed(feed):
 
     if latest:
         try:
+            # latest_title = latest['title'].encode(sys.stdout.encoding, errors='replace').decode(sys.stdout.encoding)
             latest_title = latest['title'].encode(sys.stdout.encoding, errors='replace').decode(sys.stdout.encoding)
+
         except Exception as e:
             print(f"Error encoding latest title: {e}")
             latest_title = None
@@ -134,12 +142,8 @@ def check_feed(feed):
             }
             new_entries.append(new_job)
 
-    # Print the new entries for debugging
-    print("New entries:", new_entries)
-
     socketio.emit('new_job', new_entries)
     return new_entries
-
 
 
 @app.route('/')
@@ -167,6 +171,16 @@ def index():
     # previous_job_postings = JobPosting.query.all()
     
     return render_template('index.html', **entries)
+
+
+
+def fetch_and_emit_job(key, url):
+    entries = check_feed(fetch_url(url))
+    for entry in entries:
+        job_data = {'job': entry, 'category': key}  
+        print(f"Emitting job data: {job_data}")
+        socketio.emit('new_job', job_data, namespace='/')
+
 
 @socketio.on('connect')
 def connect():
@@ -198,10 +212,6 @@ def connect():
 def disconnect():
     print('Client disconnected')
 
-def fetch_and_emit_job(key, url):
-    entries = check_feed(fetch_url(url))
-    for entry in entries:
-        socketio.emit('new_job', {'job': entry, 'category': key}, namespace='/')
 
 def main():
     socketio.run(app, debug=True)
