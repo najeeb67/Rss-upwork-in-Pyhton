@@ -13,12 +13,10 @@ app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 
-scheduler = BackgroundScheduler()
+
 
 RSS_react_url = "https://www.upwork.com/ab/feed/jobs/rss?location=Australia%2CCanada%2CChile%2CDenmark%2CFrance%2CGermany%2CItaly%2CNetherlands%2CNew%20Zealand%2CSaudi%20Arabia%2CSwitzerland%2CUnited%20Arab%20Emirates%2CUnited%20Kingdom%2CUnited%20States&paging=0-10&q=react.js%20NOT%20Expensify&sort=recency&api_params=1&securityToken=81e2b4b45c1bf6ef8752e649541dc096c20e5256d9034c5b7b5898739550d9fb376ac7e6e4e9632b1f46b176ab780d4ebb09f44ae9b3e5ee6b505b0bbfe61d2a&userUid=1672273345003061248&orgUid=1672273345003061249"
-
 RSS_US_url ="https://www.upwork.com/ab/feed/topics/rss?securityToken=81e2b4b45c1bf6ef8752e649541dc096c20e5256d9034c5b7b5898739550d9fb376ac7e6e4e9632b1f46b176ab780d4ebb09f44ae9b3e5ee6b505b0bbfe61d2a&userUid=1672273345003061248&orgUid=1672273345003061249&sort=local_jobs_on_top&topic=domestic"
-
 RSS_NODE_url = "https://www.upwork.com/ab/feed/jobs/rss?location=Australia%2CCanada%2CChile%2CDenmark%2CFrance%2CGermany%2CItaly%2CNetherlands%2CNew%20Zealand%2CSaudi%20Arabia%2CSwitzerland%2CUnited%20Arab%20Emirates%2CUnited%20Kingdom%2CUnited%20States&paging=0-10&q=node%20NOT%20Expensify&sort=recency&api_params=1&securityToken=81e2b4b45c1bf6ef8752e649541dc096c20e5256d9034c5b7b5898739550d9fb376ac7e6e4e9632b1f46b176ab780d4ebb09f44ae9b3e5ee6b505b0bbfe61d2a&userUid=1672273345003061248&orgUid=1672273345003061249"
 RSS_PHP_url ="https://www.upwork.com/ab/feed/jobs/rss?location=Australia%2CCanada%2CDenmark%2CFrance%2CGermany%2CItaly%2CNetherlands%2CNew%20Zealand%2CSwitzerland%2CUnited%20Arab%20Emirates%2CUnited%20Kingdom%2CUnited%20States&paging=0-10&payment_verified=1&q=PHP&sort=recency&api_params=1&securityToken=81e2b4b45c1bf6ef8752e649541dc096c20e5256d9034c5b7b5898739550d9fb376ac7e6e4e9632b1f46b176ab780d4ebb09f44ae9b3e5ee6b505b0bbfe61d2a&userUid=1672273345003061248&orgUid=1672273345003061249"
 RSS_WORDPRES_url = "https://www.upwork.com/ab/feed/jobs/rss?location=Australia%2CCanada%2CChile%2CDenmark%2CFrance%2CGermany%2CItaly%2CNetherlands%2CNew%20Zealand%2CSaudi%20Arabia%2CSwitzerland%2CUnited%20Arab%20Emirates%2CUnited%20Kingdom%2CUnited%20States&paging=0-10&q=wordpress%20NOT%20india&sort=recency&api_params=1&securityToken=81e2b4b45c1bf6ef8752e649541dc096c20e5256d9034c5b7b5898739550d9fb376ac7e6e4e9632b1f46b176ab780d4ebb09f44ae9b3e5ee6b505b0bbfe61d2a&userUid=1672273345003061248&orgUid=1672273345003061249"
@@ -32,27 +30,19 @@ RSS_SCRIPPTING_url ="https://www.upwork.com/ab/feed/jobs/rss?location=Australia%
 RSS_BUBBLE_url="https://www.upwork.com/ab/feed/jobs/rss?location=Australia%2CCanada%2CChile%2CDenmark%2CFrance%2CGermany%2CItaly%2CNetherlands%2CNew%20Zealand%2CSaudi%20Arabia%2CSwitzerland%2CUnited%20Arab%20Emirates%2CUnited%20Kingdom%2CUnited%20States&paging=0-10&q=bubble&sort=recency&api_params=1&securityToken=81e2b4b45c1bf6ef8752e649541dc096c20e5256d9034c5b7b5898739550d9fb376ac7e6e4e9632b1f46b176ab780d4ebb09f44ae9b3e5ee6b505b0bbfe61d2a&userUid=1672273345003061248&orgUid=1672273345003061249"
 RSS_WEBRTC_url="https://www.upwork.com/ab/feed/jobs/rss?location=Australia%2CCanada%2CChile%2CDenmark%2CFrance%2CGermany%2CItaly%2CNetherlands%2CNew%20Zealand%2CSaudi%20Arabia%2CSwitzerland%2CUnited%20Arab%20Emirates%2CUnited%20Kingdom%2CUnited%20States&paging=0-10&q=webrtc%20OR%20socket&sort=recency&api_params=1&securityToken=81e2b4b45c1bf6ef8752e649541dc096c20e5256d9034c5b7b5898739550d9fb376ac7e6e4e9632b1f46b176ab780d4ebb09f44ae9b3e5ee6b505b0bbfe61d2a&userUid=1672273345003061248&orgUid=1672273345003061249"
 RSS_VUE_url ="https://www.upwork.com/ab/feed/jobs/rss?location=Australia%2CCanada%2CChile%2CDenmark%2CFrance%2CGermany%2CItaly%2CNetherlands%2CNew%20Zealand%2CSaudi%20Arabia%2CSwitzerland%2CUnited%20Arab%20Emirates%2CUnited%20Kingdom%2CUnited%20States&paging=0-10&q=vue&sort=recency&api_params=1&securityToken=81e2b4b45c1bf6ef8752e649541dc096c20e5256d9034c5b7b5898739550d9fb376ac7e6e4e9632b1f46b176ab780d4ebb09f44ae9b3e5ee6b505b0bbfe61d2a&userUid=1672273345003061248&orgUid=1672273345003061249"
-
 RSS_Pyhton_url = "https://www.upwork.com/ab/feed/jobs/rss?location=Australia%2CCanada%2CChile%2CDenmark%2CFrance%2CGermany%2CItaly%2CNetherlands%2CNew%20Zealand%2CSaudi%20Arabia%2CSwitzerland%2CUnited%20Arab%20Emirates%2CUnited%20Kingdom%2CUnited%20States&paging=0-10&q=python%20NOT%20india&sort=recency&api_params=1&securityToken=81e2b4b45c1bf6ef8752e649541dc096c20e5256d9034c5b7b5898739550d9fb376ac7e6e4e9632b1f46b176ab780d4ebb09f44ae9b3e5ee6b505b0bbfe61d2a&userUid=1672273345003061248&orgUid=1672273345003061249"
-
 
 Rss_File = "File.txt"
 
-def fetch_with_retry(url, count=10, max_retries=3, retry_delay=1):
+def fetch_with_retry(url, count=10, max_retries=3, retry_delay=1, fetch_delay=2):
     retries = 0
     while retries < max_retries:
         try:
             url_with_paging = f"{url}&paging=0-{count}"
             response = requests.get(url_with_paging)
-            response.raise_for_status()
-            
-            # Print out the raw feed data
-            print("Raw Feed Data:", response.text)
-            
-            parsed_data = feedparser.parse(response.text)
-            print("Parsed Data:", parsed_data)
-            
-            return parsed_data
+            response.raise_for_status()  
+            time.sleep(fetch_delay) 
+            return feedparser.parse(response.text)
         except requests.exceptions.RequestException as e:
             print(f"Error fetching {url}: {e}")
             if isinstance(e, requests.exceptions.HTTPError) and e.response.status_code == 429:
@@ -65,6 +55,7 @@ def fetch_with_retry(url, count=10, max_retries=3, retry_delay=1):
                 break
     print(f"Failed to fetch {url} after {max_retries} retries")
     return None
+
 
 
 def fetch_url(url, count=10):
@@ -104,9 +95,7 @@ def check_feed(feed):
 
     if latest:
         try:
-            # latest_title = latest['title'].encode(sys.stdout.encoding, errors='replace').decode(sys.stdout.encoding)
             latest_title = latest['title'].encode(sys.stdout.encoding, errors='replace').decode(sys.stdout.encoding)
-
         except Exception as e:
             print(f"Error encoding latest title: {e}")
             latest_title = None
@@ -172,16 +161,6 @@ def index():
     
     return render_template('index.html', **entries)
 
-
-
-def fetch_and_emit_job(key, url):
-    entries = check_feed(fetch_url(url))
-    for entry in entries:
-        job_data = {'job': entry, 'category': key}  
-        print(f"Emitting job data: {job_data}")
-        socketio.emit('new_job', job_data, namespace='/')
-
-
 @socketio.on('connect')
 def connect():
     print("client connected")
@@ -206,12 +185,13 @@ def connect():
     }
 
     for key, url in feeds.items():
-        scheduler.add_job(fetch_and_emit_job, 'interval', seconds=5, args=[key, url])
+            entries = check_feed(fetch_url(url))
+            for entry in entries:
+                socketio.emit('new_job', {'job': entry, 'category': key},  namespace='/')
 
 @socketio.on('disconnect')
 def disconnect():
     print('Client disconnected')
-
 
 def main():
     socketio.run(app, debug=True)
