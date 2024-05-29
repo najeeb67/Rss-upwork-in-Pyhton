@@ -39,8 +39,14 @@ socket.on('new_job', function(data) {
             console.error("Job list not found for category:", data.category);
         }
 
+        if (!localStorage.getItem('notified_' + data.job.id)) {
+            console.log('New job detected. Sending notification.');
+            notify(data.job, data.category);
+            localStorage.setItem('notified_' + data.job.id, true);
+        } else {
+            console.log('Job already notified:', data.job.id);
+        }
 
-        notify(data.job, data.category);
     } else {
         console.error("Received job is undefined or missing category property");
         console.log("Data received:", data);
@@ -94,12 +100,11 @@ function notify(job, category) {
     }
 }
 
-// notify("hello", "this thewlnfbv")
-// Function to update badge count
 function updateBadgeCount(category, count) {
     var badge = document.querySelector('.job-badge[data-category="' + category + '"]');
     if (badge) {
         badge.innerText = count.toString();
+        newJobCounts[category] = count;
     }
 }
 
@@ -118,6 +123,15 @@ function reloadPage() {
 
 // Window onload event
 window.onload = function() {
+    // Do not clear localStorage to preserve notified jobs
+    var notifiedJobs = [];
+    for (var key in localStorage) {
+        if (key.startsWith('notified_')) {
+            notifiedJobs.push(key.substring('notified_'.length));
+        }
+    }
+
+    // Set the selected category from localStorage
     var selectedCategory = localStorage.getItem('selectedCategory');
     if (selectedCategory) {
         showJobs(selectedCategory);
