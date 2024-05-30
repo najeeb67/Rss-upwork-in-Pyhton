@@ -40,11 +40,7 @@ socket.on('new_job', function(data) {
         }
 
         if (!localStorage.getItem('notified_' + data.job.id)) {
-            console.log('New job detected. Sending notification.');
             notify(data.job, data.category);
-            localStorage.setItem('notified_' + data.job.id, true);
-        } else {
-            console.log('Job already notified:', data.job.id);
         }
 
     } else {
@@ -98,13 +94,13 @@ function notify(job, category) {
     } else {
         console.log("Notification permission not granted");
     }
+    localStorage.setItem('notified_' + job.id, true);
 }
 
 function updateBadgeCount(category, count) {
     var badge = document.querySelector('.job-badge[data-category="' + category + '"]');
     if (badge) {
         badge.innerText = count.toString();
-        newJobCounts[category] = count;
     }
 }
 
@@ -123,15 +119,14 @@ function reloadPage() {
 
 // Window onload event
 window.onload = function() {
-    // Do not clear localStorage to preserve notified jobs
-    var notifiedJobs = [];
+    // Retrieve notified jobs from localStorage
+    var notifiedJobs = {};
     for (var key in localStorage) {
         if (key.startsWith('notified_')) {
-            notifiedJobs.push(key.substring('notified_'.length));
+            notifiedJobs[key] = true;
         }
     }
 
-    // Set the selected category from localStorage
     var selectedCategory = localStorage.getItem('selectedCategory');
     if (selectedCategory) {
         showJobs(selectedCategory);
@@ -139,6 +134,24 @@ window.onload = function() {
         showJobs('python');
     }
     reloadPage();
+
+    // Retrieve existing jobs and notify only for new jobs
+    var jobCategories = document.querySelectorAll('.main-content > div');
+    jobCategories.forEach(function(categoryElement) {
+        var category = categoryElement.id.replace('Jobs', '');
+        var jobs = categoryElement.querySelectorAll('.job-item');
+        jobs.forEach(function(job) {
+            var jobId = job.querySelector('.job-title').getAttribute('href');
+            if (!notifiedJobs['notified_' + jobId]) {
+                var jobData = {
+                    title: job.querySelector('.job-title').innerText,
+                    link: job.querySelector('.job-title').getAttribute('href'),
+                    published: job.querySelector('.job-published').innerText
+                };
+                notify(jobData, category);
+            }
+        });
+    });
 };
 
 // Helper function to show jobs by category
