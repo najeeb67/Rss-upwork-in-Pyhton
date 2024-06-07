@@ -2,7 +2,7 @@ import feedparser
 from datetime import datetime, timedelta
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask, render_template
-from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
 from flask_socketio import SocketIO
 import sys
 import requests
@@ -10,6 +10,7 @@ import time
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
+CORS(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 
@@ -57,19 +58,18 @@ def fetch_with_retry(url, count=10, max_retries=3, retry_delay=1, fetch_delay=2)
     return None
 
 
-
-def fetch_url(url, count=10):
+def fetch_url(url, count=50):
     return fetch_with_retry(url, count)
 
 def get_title():
     try:
-        with open(Rss_File, 'r') as file:
+        with open('rss_title.txt', 'r') as file: 
             return file.read().strip()
     except FileNotFoundError:
         return None
 
 def set_title(title):
-    with open(Rss_File, 'w', encoding="utf-8") as file:
+    with open('rss_title.txt', 'w', encoding="utf-8") as file:  
         file.write(title)
 
 def latest_entry(feed):
@@ -78,7 +78,6 @@ def latest_entry(feed):
     else:
         print("Error: Failed to parse feed.")
         return None
-
 
 fetched_categories = set()
 
@@ -89,7 +88,7 @@ def check_feed(feed):
         return []
 
     new_entries = []
-    latest = latest_entry(feed) 
+    latest = latest_entry(feed)
     new_get_titles = get_title()
     current_time = datetime.now()
 
@@ -108,14 +107,14 @@ def check_feed(feed):
             }
             new_entries.append(new_job)
             set_title(latest_title)
-            print(f"New job posting: {latest_title}")  
+            print(f"New job posting: {latest_title}")
 
             category = latest_title.split()[0]
             if category not in fetched_categories:
                 print(f"New category Fetch: {category}")
                 fetched_categories.add(category)
 
-    for entry in feed.entries:
+    for entry in feed.entries[:50]:  # Ensure we only take the first 50 entries
         try:
             entry_time = datetime.strptime(entry.published, '%a, %d %b %Y %H:%M:%S %z')
             entry_time = entry_time.replace(tzinfo=None)
@@ -131,8 +130,11 @@ def check_feed(feed):
             }
             new_entries.append(new_job)
 
-    socketio.emit('new_job', new_entries)
+            socketio.emit('new_job', new_job)
+            print(f"Emitted new_job event with data: {new_job} for category: {new_entries}")
+
     return new_entries
+
 
 
 @app.route('/')
@@ -185,9 +187,11 @@ def connect():
     }
 
     for key, url in feeds.items():
-            entries = check_feed(fetch_url(url))
-            for entry in entries:
-                socketio.emit('new_job', {'job': entry, 'category': key},  namespace='/')
+        entries = check_feed(fetch_url(url))
+        return entries
+        for entry in entries:
+            socketio.emit('new_job', {'job': entry, 'category': key}, namespace='/')
+            print(f"Emitted new_job event with data: {entry} for category: {key}")
 
 @socketio.on('disconnect')
 def disconnect():

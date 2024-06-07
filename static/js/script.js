@@ -1,48 +1,36 @@
-// Establish socket connection
-var socket = io.connect('http://localhost:5000');
+var socket = io.connect('http://localhost:5000', {
+    timeout: 20000,
+    reconnectonAttempts:5, 
+});
 
-// Variables
-var isConnected = false;
-var NotificationCount = 0;
-var newJobCounts = {
-    python: 0,
-    react: 0,
-    // Add other categories here...
-};
-
-// Event listeners for socket connection
 socket.on('connect', function() {
-    isConnected = true;
     console.log('Connected to server');
 });
 
 socket.on('disconnect', function() {
-    isConnected = false;
     console.log('Disconnected from server');
+});
+
+socket.on('connect_error', (err) => {
+    console.log(`connect_error due to ${err.message}`);
 });
 
 socket.on('new_job', function(data) {
     console.log("Received new job event with data:", data);
 
-    // Ensure data and data.job are defined
     if (data && data.category && data.job) {
+        notify(data.job,data.category);
         console.log("Job category:", data.category);
 
-        // Update job list
         var jobList = document.getElementById(data.category + 'Jobs');
         if (jobList) {
             var jobItem = document.createElement('div');
             jobItem.classList.add('job-item');
-            jobItem.innerHTML = '<a class="job-title" href="' + data.job.link + '" onclick="markAsClicked(this)" target="_blank">' + data.job.title + '</a><p class="job-published">Published: ' + data.job.published + '</p>';
+            jobItem.innerHTML = '<a class="job-title" href="' + data.job.link + '" target="_blank">' + data.job.title + '</a><p class="job-published">Published: ' + data.job.published + '</p>';
             jobList.insertBefore(jobItem, jobList.firstChild);
         } else {
             console.error("Job list not found for category:", data.category);
         }
-
-        if (!localStorage.getItem('notified_' + data.job.id)) {
-            notify(data.job, data.category);
-        }
-
     } else {
         console.error("Received job is undefined or missing category property");
         console.log("Data received:", data);
