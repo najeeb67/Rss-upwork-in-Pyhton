@@ -1,7 +1,4 @@
-var socket = io.connect('http://localhost:5000', {
-    timeout: 20000,
-    reconnectonAttempts:5, 
-});
+var socket = io.connect('http://localhost:5000');
 
 socket.on('connect', function() {
     console.log('Connected to server');
@@ -15,25 +12,36 @@ socket.on('connect_error', (err) => {
     console.log(`connect_error due to ${err.message}`);
 });
 
+var newJobCounts = [];
+
 socket.on('new_job', function(data) {
     console.log("Received new job event with data:", data);
 
-    if (data && data.category && data.job) {
-        notify(data.job,data.category);
-        console.log("Job category:", data.category);
+    // Ensure data and data.job are defined
+    if (data && data.title && data.link && data.published) {
+        var currentTime = new Date();
+        var publishedTime = new Date(data.published);
 
-        var jobList = document.getElementById(data.category + 'Jobs');
-        if (jobList) {
-            var jobItem = document.createElement('div');
-            jobItem.classList.add('job-item');
-            jobItem.innerHTML = '<a class="job-title" href="' + data.job.link + '" target="_blank">' + data.job.title + '</a><p class="job-published">Published: ' + data.job.published + '</p>';
-            jobList.insertBefore(jobItem, jobList.firstChild);
-        } else {
-            console.error("Job list not found for category:", data.category);
+        // Check if the job is published within the last 30 seconds
+        if ((currentTime - publishedTime) / 1000 <= 30) {
+            console.log("Job category:", data.category);
+
+            // Notification
+            notify(data, data.category);
+
+            // Update job list
+            var jobList = document.getElementById(data.category + 'Jobs');
+            if (jobList) {
+                var jobItem = document.createElement('div');
+                jobItem.classList.add('job-item');
+                jobItem.innerHTML = '<a class="job-title" href="' + data.link + '" onclick="markAsClicked(this)" target="_blank">' + data.title + '</a><p class="job-published">Published: ' + data.published + '</p>';
+                jobList.appendChild(jobItem);
+            } else {
+                console.error("Job list not found for category:", data.category);
+            }
         }
     } else {
-        console.error("Received job is undefined or missing category property");
-        console.log("Data received:", data);
+        console.error("Invalid job data received:", data);
     }
 });
 
@@ -56,33 +64,22 @@ if ("Notification" in window) {
     console.log('Notification not supported');
 }
 
+var NotificationCount = [];
 // Notification function
 function notify(job, category) {
-    console.log("Notify function called with job:", job, "and category:", category);
-
-    if (!job || !category) {
-        console.error("Job or category is undefined");
-        return;
-    }
-
     if (Notification.permission === 'granted') {
-        var notification = new Notification("New " + category + " Job", {
-            body: "New Job: " + job.title
+        var notification = new Notification('New Job Posted', {
+            body: job.title + ' in ' + category,
+            data: { url: job.link }
         });
 
-        notification.onclick = function() {
-            console.log("Notification clicked!");
-            // Optionally handle click event
+        notification.onclick = function(event) {
+            event.preventDefault(); // Prevent the browser from focusing the Notification's tab
+            window.open(notification.data.url, '_blank');
         };
-
-        NotificationCount++;
-        document.title = "(" + NotificationCount + ") Job Finder";
-
-        updateBadgeCount(category, newJobCounts[category] + 1);
     } else {
-        console.log("Notification permission not granted");
+        console.log('Notification permission not granted');
     }
-    localStorage.setItem('notified_' + job.id, true);
 }
 
 function updateBadgeCount(category, count) {

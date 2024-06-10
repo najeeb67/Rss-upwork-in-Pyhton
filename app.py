@@ -33,6 +33,26 @@ RSS_WEBRTC_url="https://www.upwork.com/ab/feed/jobs/rss?location=Australia%2CCan
 RSS_VUE_url ="https://www.upwork.com/ab/feed/jobs/rss?location=Australia%2CCanada%2CChile%2CDenmark%2CFrance%2CGermany%2CItaly%2CNetherlands%2CNew%20Zealand%2CSaudi%20Arabia%2CSwitzerland%2CUnited%20Arab%20Emirates%2CUnited%20Kingdom%2CUnited%20States&paging=0-10&q=vue&sort=recency&api_params=1&securityToken=81e2b4b45c1bf6ef8752e649541dc096c20e5256d9034c5b7b5898739550d9fb376ac7e6e4e9632b1f46b176ab780d4ebb09f44ae9b3e5ee6b505b0bbfe61d2a&userUid=1672273345003061248&orgUid=1672273345003061249"
 RSS_Pyhton_url = "https://www.upwork.com/ab/feed/jobs/rss?location=Australia%2CCanada%2CChile%2CDenmark%2CFrance%2CGermany%2CItaly%2CNetherlands%2CNew%20Zealand%2CSaudi%20Arabia%2CSwitzerland%2CUnited%20Arab%20Emirates%2CUnited%20Kingdom%2CUnited%20States&paging=0-10&q=python%20NOT%20india&sort=recency&api_params=1&securityToken=81e2b4b45c1bf6ef8752e649541dc096c20e5256d9034c5b7b5898739550d9fb376ac7e6e4e9632b1f46b176ab780d4ebb09f44ae9b3e5ee6b505b0bbfe61d2a&userUid=1672273345003061248&orgUid=1672273345003061249"
 
+feeds = {
+        "python_entries": RSS_Pyhton_url,
+        "react_entries": RSS_react_url,
+        "us_entries": RSS_US_url,
+        "node_entries": RSS_NODE_url,
+        "php_entries": RSS_PHP_url,
+        "wordpress_entries": RSS_WORDPRES_url,
+        "quickbooks_entries": RSS_QUICKBOOKS_url,
+        "shopify_entries": RSS_SHOPIFY_url,
+        "api_integration_entries": RSS_API_INTEGRAGATION_url,
+        "payment_gateway_entries": RSS_PAYMENT_GETWAY_url,
+        "full_time_entries": RSS_FULL_TIME_url,
+        "chatbot_entries": RSS_CHATBOT_url,
+        "scripting_entries": RSS_SCRIPPTING_url,
+        "bubble_entries": RSS_BUBBLE_url,
+        "webrtc_entries": RSS_WEBRTC_url,
+        "vue_entries": RSS_VUE_url,
+    }
+
+
 Rss_File = "File.txt"
 
 def fetch_with_retry(url, count=10, max_retries=3, retry_delay=1, fetch_delay=2):
@@ -78,6 +98,7 @@ def latest_entry(feed):
     else:
         print("Error: Failed to parse feed.")
         return None
+
 
 fetched_categories = set()
 
@@ -139,24 +160,6 @@ def check_feed(feed):
 
 @app.route('/')
 def index():
-    feeds = {
-        "python_entries": RSS_Pyhton_url,
-        "react_entries": RSS_react_url,
-        "us_entries": RSS_US_url,
-        "node_entries": RSS_NODE_url,
-        "php_entries": RSS_PHP_url,
-        "wordpress_entries": RSS_WORDPRES_url,
-        "quickbooks_entries": RSS_QUICKBOOKS_url,
-        "shopify_entries": RSS_SHOPIFY_url,
-        "api_integration_entries": RSS_API_INTEGRAGATION_url,
-        "payment_gateway_entries": RSS_PAYMENT_GETWAY_url,
-        "full_time_entries": RSS_FULL_TIME_url,
-        "chatbot_entries": RSS_CHATBOT_url,
-        "scripting_entries": RSS_SCRIPPTING_url,
-        "bubble_entries": RSS_BUBBLE_url,
-        "webrtc_entries": RSS_WEBRTC_url,
-        "vue_entries": RSS_VUE_url,
-    }
 
     entries = {key: check_feed(fetch_url(url)) for key, url in feeds.items()}
     # previous_job_postings = JobPosting.query.all()
@@ -166,26 +169,6 @@ def index():
 @socketio.on('connect')
 def connect():
     print("client connected")
-
-    feeds = {
-        "new_python_job": RSS_Pyhton_url,
-        "new_react_job": RSS_react_url,
-        "new_us_job": RSS_US_url,
-        "new_node_job": RSS_NODE_url,
-        "new_php_job": RSS_PHP_url,
-        "new_wordpress_job": RSS_WORDPRES_url,
-        "new_quickbooks_job": RSS_QUICKBOOKS_url,
-        "new_shopify_job": RSS_SHOPIFY_url,
-        "new_api_integration_job": RSS_API_INTEGRAGATION_url,
-        "new_payment_gateway_job": RSS_PAYMENT_GETWAY_url,
-        "new_full_time_job": RSS_FULL_TIME_url,
-        "new_chatbot_job": RSS_CHATBOT_url,
-        "new_scripting_job": RSS_SCRIPPTING_url,
-        "new_bubble_job": RSS_BUBBLE_url,
-        "new_webrtc_job": RSS_WEBRTC_url,
-        "new_vue_job": RSS_VUE_url,
-    }
-
     for key, url in feeds.items():
         entries = check_feed(fetch_url(url))
         return entries
