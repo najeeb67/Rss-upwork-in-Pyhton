@@ -32,23 +32,22 @@
             </ul>
 
         </div>
-        <div class="main-content" style="
-            overflow: scroll;
-            height: 90vh">
-                <div id="pythonJobs" style="display: none;">
+        <div class="main-content" style="overflow: scroll; height: 90vh;">
+            <div id="pythonJobs" class="job-category" style="display: none;">
                 <h1>Python Jobs</h1>
-                <div id ="job-item">
-                {% for job in python_entries %}
-                <div class="job-item" >
-                    <a class="job-title" href="{{ job.link }}" onclick="markAsClicked(this)" target="_blank">{{ job.title }}</a>
-                    <p class="job-published">Published: {{ job.published }}</p>
+                <div id="pythonJobItems" class="job-items">
+                    {% for job in python_entries %}
+                    <div class="job-item">
+                        <a class="job-title" href="{{ job.link }}" onclick="markAsClicked(this)" target="_blank">{{ job.title }}</a>
+                        <p class="job-published">Published: {{ job.published }}</p>
+                    </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
-            </div>
             </div>
             
-            <div id="reactJobs" style="display: none;">
+            <div id="reactJobs" class="job-category" style="display: none;">
                 <h1>React Jobs</h1>
+                <div id="reactJobItems" class="job-items">
                 {% for job in react_entries %}
                 <div class="job-item">
                     <a class="job-title" href="{{ job.link }}" onclick="markAsClicked(this)" target="_blank">{{ job.title }}</a>
@@ -56,9 +55,11 @@
                 </div>
                 {% endfor %}
             </div>
+         </div>
             
-            <div id="usJobs" style="display: none;">
+            <div id="usJobs" class="job-category" style="display: none;">
                 <h1>US Jobs</h1>
+                <div id="usJobItems" class="job-items">
                 {% for job in us_entries %}
                 <div class="job-item">
                     <a class="job-title" href="{{ job.link }}" onclick="markAsClicked(this)" target="_blank">{{ job.title }}</a>
@@ -66,9 +67,11 @@
                 </div>
                 {% endfor %}
             </div>
-            
-            <div id="nodeJobs" style="display: none;">
+        </div>
+
+            <div id="nodeJobs" class="job-category" style="display: none;">
                 <h1>Node.js Jobs</h1>
+                <div id="nodeJobItems" class="job-items">
                 {% for job in node_entries %}
                 <div class="job-item">
                     <a class="job-title" href="{{ job.link }}" onclick="markAsClicked(this)" target="_blank">{{ job.title }}</a>
@@ -76,9 +79,11 @@
                 </div>
                 {% endfor %}
             </div>
-            
-            <div id="phpJobs" style="display: none;">
+        </div>
+        
+            <div id="phpJobs" class="job-category" style="display: none;">
                 <h1>PHP Jobs</h1>
+                <div id="phpJobItems" class="job-items">
                 {% for job in php_entries %}
                 <div class="job-item">
                     <a class="job-title" href="{{ job.link }}" onclick="markAsClicked(this)" target="_blank">{{ job.title }}</a>
@@ -86,9 +91,11 @@
                 </div>
                 {% endfor %}
             </div>
-            
-            <div id="wordpressJobs" style="display: none;">
+        </div>
+
+            <div id="wordpressJobs" class="job-category" style="display: none;">
                 <h1>Wordpress Jobs</h1>
+                <div id="wordpressJobItems" class="job-items">
                 {% for job in wordpress_entries %}
                 <div class="job-item">
                     <a class="job-title" href="{{ job.link }}" onclick="markAsClicked(this)" target="_blank">{{ job.title }}</a>
@@ -96,9 +103,11 @@
                 </div>
                 {% endfor %}
             </div>
-            
-            <div id="quickbooksJobs" style="display: none;">
+        </div>
+
+            <div id="quickbooksJobs" class="job-category" style="display: none;">
                 <h1>QuickBooks Jobs</h1>
+                <div id="quickbooksJobItems" class="job-items">
                 {% for job in quickbooks_entries %}
                 <div class="job-item">
                     <a class="job-title" href="{{ job.link }}" onclick="markAsClicked(this)" target="_blank">{{ job.title }}</a>
@@ -106,9 +115,11 @@
                 </div>
                 {% endfor %}
             </div>
+        </div>
             
-            <div id="shopifyJobs" style="display: none;">
+            <div id="shopifyJobs" class="job-category" style="display: none;">
                 <h1>Shopify Jobs</h1>
+                <div id="shopifyJobItems" class="job-items">
                 {% for job in shopify_entries %}
                 <div class="job-item">
                     <a class="job-title" href="{{ job.link }}" onclick="markAsClicked(this)" target="_blank">{{ job.title }}</a>
@@ -116,9 +127,10 @@
                 </div>
                 {% endfor %}
             </div>
-            
-            <div id="apiIntegrationJobs" style="display: none;">
+        </div>
+            <div id="apiIntegrationJobs" class="job-category" style="display: none;">
                 <h1>API Integration Jobs</h1>
+                <div id="apiIntegrationJobItems" class="job-items">
                 {% for job in api_integration_entries %}
                 <div class="job-item">
                     <a class="job-title" href="{{ job.link }}" target="_blank">{{ job.title }}</a>
@@ -126,9 +138,11 @@
                 </div>
                 {% endfor %}
             </div>
-        
-            <div id="paymentGatewayJobs" style="display: none;">
+        </div>
+
+            <div id="paymentGatewayJobs" class="job-category" style="display: none;">
                 <h1>Payment Gateway Jobs</h1>
+                <div id="paymentGatewayJobItems" class="job-items">
                 {% for job in payment_gateway_entries %}
                 <div class="job-item">
                     <a class="job-title" href="{{ job.link }}" target="_blank">{{ job.title }}</a>
@@ -136,9 +150,10 @@
                 </div>
                 {% endfor %}
             </div>
-        
-            <div id="fullTimeJobs" style="display: none;">
+        </div>
+            <div id="fullTimeJobs" class="job-category" style="display: none;">
                 <h1>Full-Time Jobs</h1>
+                <div id="fullTimeJobItems" class="job-items">
                 {% for job in full_time_entries %}
                 <div class="job-item">
                     <a class="job-title" href="{{ job.link }}" target="_blank">{{ job.title }}</a>
@@ -146,9 +161,11 @@
                 </div>
                 {% endfor %}
             </div>
+        </div>
             
-            <div id="chatbotJobs" style="display: none;">
+            <div id="chatbotJobs" class="job-category" style="display: none;">
                 <h1>Chatbot Jobs</h1>
+                <div id="chatbotJobItems" class="job-items">    
                 {% for job in chatbot_entries %}
                 <div class="job-item">
                     <a class="job-title" href="{{ job.link }}" onclick="markAsClicked(this)" target="_blank">{{ job.title }}</a>
@@ -156,9 +173,11 @@
                 </div>
                 {% endfor %}
             </div>
+        </div>
             
-            <div id="scriptingJobs" style="display: none;">
+            <div id="scriptingJobs" class="job-category" style="display: none;">
                 <h1>Scripting Jobs</h1>
+                <div id="scriptingJobItems" class="job-items">
                 {% for job in scripting_entries %}
                 <div class="job-item">
                     <a class="job-title" href="{{ job.link }}" onclick="markAsClicked(this)" target="_blank">{{ job.title }}</a>
@@ -166,9 +185,10 @@
                 </div>
                 {% endfor %}
             </div>
-            
-            <div id="bubbleJobs" style="display: none;">
+        </div>
+            <div id="bubbleJobs" class="job-category" style="display: none;">
                 <h1>Bubble Jobs</h1>
+                <div id="bubbleJobItems" class="job-items">
                 {% for job in bubble_entries %}
                 <div class="job-item">
                     <a class="job-title" href="{{ job.link }}" onclick="markAsClicked(this)" target="_blank">{{ job.title }}</a>
@@ -176,9 +196,10 @@
                 </div>
                 {% endfor %}
             </div>
-            
-            <div id="webrtcJobs" style="display: none;">
+        </div>
+            <div id="webrtcJobs" class="job-category" style="display: none;">
                 <h1>WebRTC Jobs</h1>
+                <div id="webrtcJobItems" class="job-items">
                 {% for job in webrtc_entries %}
                 <div class="job-item">
                     <a class="job-title" href="{{ job.link }}" onclick="markAsClicked(this)" target="_blank">{{ job.title }}</a>
@@ -186,9 +207,10 @@
                 </div>
                 {% endfor %}
             </div>
-            
-            <div id="vueJobs" style="display: none;">
+        </div>
+            <div id="vueJobs" class="job-category" style="display: none;">
                 <h1>Vue.js Jobs</h1>
+                <div id="vueJobItems" class="job-items">
                 {% for job in vue_entries %}
                 <div class="job-item">
                     <a class="job-title" href="{{ job.link }}" onclick="markAsClicked(this)" target="_blank">{{ job.title }}</a>
@@ -196,16 +218,17 @@
                 </div>
                 {% endfor %}
             </div>
+        </div>
             
         </div>
     </div>
     
-            {% for job in previous_entries %}
+            <!-- {% for job in previous_entries %}
             <div class="job-item">
                 <a class="job-title" href="{{ job.link }}" onclick="markAsClicked(this)" target="_blank">{{ job.title }}</a>
                 <p class="job-published">Published: {{ job.published }}</p>
             </div>
-            {% endfor %}
+            {% endfor %} -->
         </div>
         <div id="notificationContainer"></div>
         <div id="connectionStatus">Connected</div>
@@ -213,7 +236,10 @@
 
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>   
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </body>
 </html>
+
+

@@ -27,20 +27,20 @@ body {
     color: #333;
 }
 
-.sidebar ul {
+/* .sidebar ul {
     list-style-type: none;
     padding: 0;
-}
+} */
 
-.sidebar li {
+/* .sidebar li {
     margin-bottom: 10px;
-}
+} */
 
-.sidebar a {
+/* .sidebar a {
     text-decoration: none;
     color: #007bff;
     font-weight: bold;
-}
+} */
 
 .main-content {
     flex: 3;
@@ -93,4 +93,43 @@ h1 {
     .container {
         padding: 0 15px;
     }
+}
+
+
+
+/* CSS for badge counters */
+.job-badge {
+    font-size: 16px; /* Adjust font size as needed */
+    padding: 5px 10px; /* Adjust padding for badge */
+    border-radius: 10px; /* Make badge rounded */
+    background-color: #007bff; /* Badge background color */
+    color: white; /* Text color of the badge */
+}
+
+/* Flexbox for aligning job titles and badge counters */
+.sidebar ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.sidebar li {
+    margin-bottom: 10px;
+    display: flex; /* Use flexbox for alignment */
+    align-items: center; /* Align items vertically */
+}
+
+.sidebar a {
+    text-decoration: none;
+    color: #007bff;
+    font-weight: bold;
+    display: flex; /* Use flexbox for alignment */
+    justify-content: space-between; /* Space between job title and badge */
+    width: 100%; /* Ensure link takes full width of <li> */
+}
+
+/* Optional: Increase the font size of job titles for better readability */
+.job-title {
+    font-size: 18px;
+    flex: 1; /* Allow title to expand */
+    margin-right: 10px; /* Adjust spacing between title and badge */
 }
